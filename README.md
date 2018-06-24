@@ -1,1 +1,1 @@
-# ARC_team_5_vending_machine
+# ARC team 5 vending machine
