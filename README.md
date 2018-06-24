@@ -2,20 +2,20 @@
 
 ## Table of Content
 
-* [Introduction](#introcution)
+* [Introduction](#introduction)
 * [Video](#video)
 * [hardware](#hardware)
-* [EMSK Board firmware used in this application](#firmware)
-* [The peripheral devices used in this application](#peripheral)
-* [The hardware setup](#setup)
+    * [EMSK Board firmware used in this application](#firmware)
+    * [The peripheral devices used in this application](#peripheral)
+    * [The hardware setup](#setup)
 * [Software](#software)
-* [Makefile settings](#makefile)
+    * [Makefile settings](#makefile)
 * [User Manual](#usermanual)
-* [Before Running This Application](#before)
-* [Moving Directory](#moving)
-* [Launch VSCode IDE](#vscode)
-* [Wi-Fi hotspot connnection settings](#wifi)
-* [Entering Main](#main)
+    * [Before Running This Application](#before)
+    * [Moving Directory](#moving)
+    * [Launch VSCode IDE](#vscode)
+    * [Wi-Fi hotspot connnection settings](#wifi)
+    * [Entering Main](#main)
 * [Source code directory](#sourcecode)
 
 ## Introduction <div id='introduction'/>
