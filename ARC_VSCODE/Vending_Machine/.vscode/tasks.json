@@ -1,0 +1,62 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build debug",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "GNU_TOOLPATH=${env:ARC_ToolChain}",
+                "TOOLCHAIN=gnu",
+                "OLEVEL=O0",
+                "DEBUG=1",
+                "-j",
+                "4",
+                "APPL_FULL_NAME=${workspaceFolderBasename}",
+                "all"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "build release",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "GNU_TOOLPATH=${env:ARC_ToolChain}",
+                "TOOLCHAIN=gnu",
+                "OLEVEL=O3",
+                "-j4",
+                "APPL_FULL_NAME=${workspaceFolderBasename}",
+                "all"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "clean",
+            "command": "echo Nothing yet",
+            "windows": {
+                "command": "make",
+                "args": [
+                    "GNU_TOOLPATH=${env:ARC_ToolChain}",
+                    "TOOLCHAIN=gnu",
+                    "-j", "4",
+                    "APPL_FULL_NAME=${workspaceFolderBasename}",
+                    "clean"
+                ]
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+}

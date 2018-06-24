@@ -1,0 +1,35 @@
+obj_emsk_22/gnu_arcem7d/arc/arc_udma.o: \
+ D:/embarc_osp-master/arc/arc_udma.c \
+ D:/embarc_osp-master/inc/arc/arc_udma.h \
+ D:/embarc_osp-master/inc/embARC_toolchain.h \
+ D:/embarc_osp-master/inc/arc/arc.h \
+ D:/embarc_osp-master/inc/arc/arc_feature_config.h \
+ obj_emsk_22/gnu_arcem7d/embARC_generated/core_config.h \
+ D:/embarc_osp-master/inc/arc/arc_builtin.h \
+ D:/embarc_osp-master/inc/arc/arc_cache.h \
+ D:/embarc_osp-master/inc/arc/arc_exception.h \
+ D:/embarc_osp-master/inc/arc/arc_udma_config.h \
+ D:/embarc_osp-master/os/hal/inc/os_hal_inc.h \
+ D:/embarc_osp-master/os/freertos/include/FreeRTOS.h \
+ D:/embarc_osp-master/middleware/vending-machine/Include/FreeRTOSConfig.h \
+ D:/embarc_osp-master/os/freertos/include/projdefs.h \
+ D:/embarc_osp-master/os/freertos/include/portable.h \
+ D:/embarc_osp-master/os/freertos/include/deprecated_definitions.h \
+ D:/embarc_osp-master/os/freertos/portable/Synopsys/ARC/portmacro.h \
+ D:/embarc_osp-master/os/freertos/include/mpu_wrappers.h \
+ D:/embarc_osp-master/os/freertos/include/croutine.h \
+ D:/embarc_osp-master/os/freertos/include/list.h \
+ D:/embarc_osp-master/os/freertos/include/event_groups.h \
+ D:/embarc_osp-master/os/freertos/include/timers.h \
+ D:/embarc_osp-master/os/freertos/include/task.h \
+ D:/embarc_osp-master/os/freertos/include/list.h \
+ D:/embarc_osp-master/os/freertos/include/mpu_wrappers.h \
+ D:/embarc_osp-master/os/freertos/include/portable.h \
+ D:/embarc_osp-master/os/freertos/include/projdefs.h \
+ D:/embarc_osp-master/os/freertos/include/queue.h \
+ D:/embarc_osp-master/os/freertos/include/semphr.h \
+ D:/embarc_osp-master/os/freertos/include/queue.h \
+ D:/embarc_osp-master/os/freertos/include/StackMacros.h \
+ D:/embarc_osp-master/os/freertos/include/task.h \
+ D:/embarc_osp-master/os/freertos/include/timers.h \
+ D:/embarc_osp-master/os/freertos/portable/Synopsys/ARC/arc_freertos_exceptions.h

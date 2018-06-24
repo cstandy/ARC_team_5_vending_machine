@@ -1,0 +1,2 @@
+board/board.c:204:			EMBARC_PRINTF("WiFi connected \r\n");
+board/board.c:230:	EMBARC_PRINTF("Wait until WiFi connected...\r\n");

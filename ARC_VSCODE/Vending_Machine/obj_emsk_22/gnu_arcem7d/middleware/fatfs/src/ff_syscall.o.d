@@ -1,0 +1,29 @@
+obj_emsk_22/gnu_arcem7d/middleware/fatfs/src/ff_syscall.o: \
+ D:/embarc_osp-master/middleware/fatfs/src/ff_syscall.c \
+ D:/embarc_osp-master/os/hal/inc/os_hal_inc.h \
+ D:/embarc_osp-master/os/freertos/include/FreeRTOS.h \
+ D:/embarc_osp-master/middleware/vending-machine/Include/FreeRTOSConfig.h \
+ D:/embarc_osp-master/os/freertos/include/projdefs.h \
+ D:/embarc_osp-master/os/freertos/include/portable.h \
+ D:/embarc_osp-master/os/freertos/include/deprecated_definitions.h \
+ D:/embarc_osp-master/os/freertos/portable/Synopsys/ARC/portmacro.h \
+ D:/embarc_osp-master/os/freertos/include/mpu_wrappers.h \
+ D:/embarc_osp-master/os/freertos/include/croutine.h \
+ D:/embarc_osp-master/os/freertos/include/list.h \
+ D:/embarc_osp-master/os/freertos/include/event_groups.h \
+ D:/embarc_osp-master/os/freertos/include/timers.h \
+ D:/embarc_osp-master/os/freertos/include/task.h \
+ D:/embarc_osp-master/os/freertos/include/list.h \
+ D:/embarc_osp-master/os/freertos/include/mpu_wrappers.h \
+ D:/embarc_osp-master/os/freertos/include/portable.h \
+ D:/embarc_osp-master/os/freertos/include/projdefs.h \
+ D:/embarc_osp-master/os/freertos/include/queue.h \
+ D:/embarc_osp-master/os/freertos/include/semphr.h \
+ D:/embarc_osp-master/os/freertos/include/queue.h \
+ D:/embarc_osp-master/os/freertos/include/StackMacros.h \
+ D:/embarc_osp-master/os/freertos/include/task.h \
+ D:/embarc_osp-master/os/freertos/include/timers.h \
+ D:/embarc_osp-master/os/freertos/portable/Synopsys/ARC/arc_freertos_exceptions.h \
+ D:/embarc_osp-master/middleware/fatfs/src/ff.h \
+ D:/embarc_osp-master/middleware/fatfs/src/integer.h \
+ D:/embarc_osp-master/middleware/fatfs/src/ffconf.h

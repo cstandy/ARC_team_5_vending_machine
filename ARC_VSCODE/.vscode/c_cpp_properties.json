@@ -1,0 +1,87 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/usr/include",
+                "/usr/local/include",
+                "${workspaceRoot}",
+                "${workspaceRoot}/Include"
+            ],
+            "defines": [],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "/usr/include",
+                    "/usr/local/include",
+                    "${workspaceRoot}",
+                    "${workspaceRoot}/Include"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "${ARC_ToolChain}/include",
+                "${ARC_ToolChain}/arc-elf32/include",
+                "${ARC_ToolChain}/lib/gcc/arc-elf32/7.1.1/include",
+                "${ARC_BSP_SRC}/arc",
+                "${ARC_BSP_SRC}/board",
+                "${ARC_BSP_SRC}/board/emsk/configs/22",
+                "${ARC_BSP_SRC}/device/inc",
+                "${ARC_BSP_SRC}/device/ip/designware/gpio",
+                "${ARC_BSP_SRC}/device/ip/designware/iic",
+                "${ARC_BSP_SRC}/device/ip/designware/spi",
+                "${ARC_BSP_SRC}/device/ip/designware/uart",
+                "${ARC_BSP_SRC}/device/ip/ip_hal/inc",
+                "${ARC_BSP_SRC}/device/peripheral/flash/w25qxx",
+                "${ARC_BSP_SRC}/inc",
+                "${ARC_BSP_SRC}/inc/arc",
+                "${ARC_BSP_SRC}/library/clib",
+                "${ARC_BSP_SRC}/middleware/openthread/include",
+                "${ARC_BSP_SRC}/middleware/mbedtls/include",
+                "${workspaceRoot}",
+                "${workspaceRoot}/Include"
+            ],
+            "defines": [
+                "UNICODE",
+                "_UNICODE",
+                "BOARD_EMSK",
+                "CPU_ARC",
+                "TOOLCHAIN=ARC_GNU",
+                "__GNU__",
+                "_DEBUG"
+            ],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "${ARC_ToolChain}/include",
+                    "${ARC_ToolChain}/arc-elf32/include",
+                    "${ARC_ToolChain}/lib/gcc/arc-elf32/7.1.1/include",
+                    "${ARC_BSP_SRC}/arc",
+                    "${ARC_BSP_SRC}/board",
+                    "${ARC_BSP_SRC}/board/emsk/configs/22",
+                    "${ARC_BSP_SRC}/device/inc",
+                    "${ARC_BSP_SRC}/device/ip/designware/gpio",
+                    "${ARC_BSP_SRC}/device/ip/designware/iic",
+                    "${ARC_BSP_SRC}/device/ip/designware/spi",
+                    "${ARC_BSP_SRC}/device/ip/designware/uart",
+                    "${ARC_BSP_SRC}/device/ip/ip_hal/inc",
+                    "${ARC_BSP_SRC}/device/peripheral/flash/w25qxx",
+                    "${ARC_BSP_SRC}/inc",
+                    "${ARC_BSP_SRC}/inc/arc",
+                    "${ARC_BSP_SRC}/library/clib",
+                    "${workspaceRoot}",
+                    "${workspaceRoot}/Include"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 3
+}

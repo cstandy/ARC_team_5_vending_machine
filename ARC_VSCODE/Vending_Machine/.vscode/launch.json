@@ -1,0 +1,52 @@
+{
+    // 使用 IntelliSense 以得知可用的屬性。
+    // 暫留以檢視現有屬性的描述。
+    // 如需詳細資訊，請瀏覽: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/${workspaceFolderBasename}.elf",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "MIMode": "gdb",
+            "miDebuggerPath": "${env:ARC_ToolChain}/bin/arc-elf32-gdb",
+            "windows": {
+                "miDebuggerPath": "${env:ARC_ToolChain}/bin/arc-elf32-gdb.exe",
+                "logging": {
+                    //"engineLogging": true,
+                    "exceptions": true,
+                    "trace": true
+                }
+            },
+            "setupCommands": [
+                {
+                    "description": "Change Directory",
+                    "text": "cd ${workspaceFolder}"
+                },
+                {
+                    "description": "Read file",
+                    "text": "file ${workspaceFolderBasename}.elf",
+                    "ignoreFailures": false
+                },
+                {
+                    "description": "Connect To Device",
+                    "text": "target remote | openocd --pipe -s ${env:ARC_ToolChain}/share/openocd/scripts -f ${env:ARC_ToolChain}/share/openocd/scripts/board/snps_em_sk_v2.2.cfg\"",
+                    "ignoreFailures": false
+                },
+                {
+                    "description": "Set timout time",
+                    "text": "set remotetimeout 15"
+                },
+                {
+                    "description": "Download Image to target SRAM",
+                    "text": "load",
+                    "ignoreFailures": false
+                }
+            ],
+        }
+    ]
+}

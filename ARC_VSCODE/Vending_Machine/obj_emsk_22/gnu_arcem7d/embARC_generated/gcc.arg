@@ -1,0 +1,10 @@
+	-mcpu=em4_dmips
+	-mlittle-endian
+	-mcode-density
+	-mdiv-rem
+	-mswap
+	-mnorm
+	-mmpy-option=6
+	-mbarrel-shifter
+	--param l1-cache-size=16384
+	--param l1-cache-line-size=32
