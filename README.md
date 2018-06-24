@@ -2,7 +2,7 @@
 
 ## Table of Content
 
-* [Introduction](#Introcution)
+* [Introduction](#introcution)
 * [Video](#video)
 * [hardware](#hardware)
 * [EMSK Board firmware used in this application](#firmware)
