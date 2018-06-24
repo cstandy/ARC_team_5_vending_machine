@@ -1,10 +1,10 @@
 # ARC team 5 vending machine
 
 ## Table of Content
-1. [Introduction] (#introduction)
-2. [Hardware Connection] (#hardware)
-3. [Software] (#software)
-4. [User Manual] (#user_manual)
+* [Introduction](#introduction)
+* [Hardware Connection](#hardware)
+* [Software](#software)
+* [User Manual](#user_manual)
 
 ## Introduction <div id='introduction'/>
 We use ARC as our user terminal and connect to the server, which is implemented with cloud data management and smart selling system. Peripheral devices and sensors are added to the ARC exp. WiFi, temperature sensor, OLED and many more.
