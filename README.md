@@ -56,6 +56,7 @@ sofware requirement
 * Visual Studio code IDE
 * ARC GNU Toolchain
 * serial port terminal eg. putty
+* Apache server , phpmysql
 
 ### Makefile settings <div id='makefile'/>
 Target options about EMSK and toolchain:
@@ -70,8 +71,17 @@ TOOLCHAIN ?= gnu
 Firstly, download source code of vending machine from GitHub.
 * Source code download link: https://github.com/cstandy/ARC_team_5_vending_machine.git
 
-Then you need to register a new user account from our website 
-* register link: https://vendingsmachine.caslab.ee.ncku.edu.tw/sign_up.php
+### Run the server_side code
+1. open the Apache HTTP server 
+2. import projectarc.sql into phpmysql(Data Base)
+3. register a new user account from our website 
+ * register link: https://127.0.0.1/../server_side/sign_up.php
+
+4. change the value 'Authority' in the table 'sign_data' to 1.
+5. sign in to enter the main website
+* register link: https://127.0.0.1/../server_side/sign_in.php
+
+
 
 ### Moving Directory <div id='moving'/>
 Move the directories ```ARC_VSCODE``` and ```embarc_osp-master``` under ```D:/```
@@ -111,4 +121,20 @@ After Wi-Fi connected, FREERTOS rises all tasks including communication, oled, t
 | numpad_task.c        | user input             |
 | LED_task.c           | make the board blinky  |
 | FreeRTOSConfig.c     | Freertos configuration |
+
+
+
+* ```..\server_side\```
+
+| FILE                 | description                         |
+| -------------------: | :---------------------              |
+| item.php             | change vending machine's data       |
+| item.css             | to typeset item.php                 |
+| logout.php           | logout                              |
+| read.php             | updata both side server and arc     |
+| sign_in.php          | sign into the item.php              |
+| sign_up.php          | create an account                   |
+| arc2php.txt          | exchange data from arc to server    |
+| com2arc.txt          | exchange data from server to arc    |
+| projectarc.sql       | initialize the data in the data base|
 
