@@ -1,5 +1,0 @@
-4	3	1234
-1	Soda  	25	drinks	 2018-06-14	2
-2	Water 	25	drinks	 2018-06-29	3
-3	Coffee	25	drinks	 2018-05-31	4
-4	Chips 	25	food  	 2018-05-30	5
