@@ -17,6 +17,7 @@
     * [Wi-Fi hotspot connnection settings](#wifi)
     * [Hardware Setting Complete](#hd_complete)
 * [Source Code Directory](#sourcecode)
+    * [File Description](#file_description)
 
 ## Introduction <div id='introduction'/>
 
@@ -137,6 +138,8 @@ Settings is now finished. You can start compiling and run this application.
     |-- sing_in.php
     |-- sing_up.php
 ```
+
+### File Description <div id='file_description'/>
 
 * main function directory ```arc_osp-master\middleware\vending-machine```
 	* Include
