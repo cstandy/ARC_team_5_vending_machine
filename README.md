@@ -16,7 +16,7 @@
     * [Launch VSCode IDE](#vscode)
     * [Wi-Fi hotspot connnection settings](#wifi)
     * [Hardware Setting Complete](#hd_complete)
-* [Source code directory](#sourcecode)
+* [Source Code Directory](#sourcecode)
 
 ## Introduction <div id='introduction'/>
 We use ARC as our user terminal and connect to the server, which is implemented with cloud data management and smart selling system. Peripheral devices and sensors are added to the ARC exp. WiFi, temperature sensor, OLED and many more.
@@ -75,15 +75,13 @@ Firstly, download source code of vending machine from GitHub.
 
 ### Run the server_side code
 1. open the Apache HTTP server 
-2. import projectarc.sql into phpmysql(Data Base)
+2. import projectarc.sql into phpmysql (Data Base)
 3. register a new user account from our website 
     * register link: https://127.0.0.1/../server_side/sign_up.php
 
 4. change the value 'Authority' in the table 'sign_data' to 1.
 5. sign in to enter the main website
     * register link: https://127.0.0.1/../server_side/sign_in.php
-
-
 
 ### Moving Directory <div id='moving'/>
 Move the directories ```ARC_VSCODE``` and ```embarc_osp-master``` under ```D:/```.
@@ -101,10 +99,10 @@ Modify the ssid and password of Wi-Fi AP in ``` D:/embarc_osp-master/board/emsk/
 #define WF_HOTSPOT_PASSWD           "12345678"
 ```
 
-### Hardware Setting Complete <div id='hd_complete'/>
-Hardware settings is now finished. After setting up software, you can start compiling and run this application.
+### Setting Complete <div id='hd_complete'/>
+Settings is now finished. You can start compiling and run this application.
 
-## Source code directory <div id='sourcecode'/>
+## Source Code Directory <div id='sourcecode'/>
 
 * main function directory ```arc_osp-master\middleware\vending-machine```
 	* Include
