@@ -105,6 +105,39 @@ Settings is now finished. You can start compiling and run this application.
 
 ## Source Code Directory <div id='sourcecode'/>
 
+```
+|-- README.md
+|-- ARC_VSCODE
+    |-- .vscode
+        |-- c_cpp_properties.json
+        |-- settings.json
+    |-- Vending_Machine
+        |-- .vscode
+            |-- c_cpp_properties.json
+            |-- launch.json
+            |-- tasks.json
+        |-- Source
+            |-- main.c
+        |-- makefile
+    |-- ARC.code-workspace
+    |-- StartVSCode.bat
+|-- doc
+    |-- PIC.zip
+    |-- doc.rar
+|-- embarc_osp-master
+    |-- ...
+|-- server_side
+    |-- arc2php.txt
+    |-- com2arc.txt
+    |-- items.css
+    |-- item.php
+    |-- logout.php
+    |-- projectar.sql
+    |-- read.php
+    |-- sing_in.php
+    |-- sing_up.php
+```
+
 * main function directory ```arc_osp-master\middleware\vending-machine```
 	* Include
 	* Source
