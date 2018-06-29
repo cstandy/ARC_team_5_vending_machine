@@ -4,8 +4,8 @@
 
 * [Introduction](#introduction)
 * [Video](#video)
-* [hardware](#hardware)
-    * [EMSK Board firmware used in this application](#firmware)
+* [Hardware](#hardware)
+    * [EMSK board firmware used in this application](#firmware)
     * [The peripheral devices used in this application](#peripheral)
     * [The hardware setup](#setup)
 * [Software](#software)
@@ -15,7 +15,7 @@
     * [Moving Directory](#moving)
     * [Launch VSCode IDE](#vscode)
     * [Wi-Fi hotspot connnection settings](#wifi)
-    * [Entering Main](#main)
+    * [Hardware Setting Complete](#hd_complete)
 * [Source code directory](#sourcecode)
 
 ## Introduction <div id='introduction'/>
@@ -26,8 +26,8 @@ Our vending machine system provides maintainance issue related to vending machin
 ## Video <div id='video'/>
 http://v.youku.com/v_show/id_XMzYzMDE0MTg1Mg==.html?spm=a2h0k.8191407.0.0&from=s1.8-1-1.2
 
-## hardware connection <div id='hardware'/>
-### EMSK Board firmware used in this application <div id='firmware'/>
+## Hardware <div id='hardware'/>
+### EMSK board firmware used in this application <div id='firmware'/>
 * emsk ver2.2
 
 ### The peripheral devices used in this application <div id='peripheral'/>
@@ -37,7 +37,7 @@ http://v.youku.com/v_show/id_XMzYzMDE0MTg1Mg==.html?spm=a2h0k.8191407.0.0&from=s
 | Wi-Fi            | EMW3162 |
 | OLED             | SSD1306 |
 | temperture       | adt7420 |
-| DC motor	       | 9V      |
+| DC motor         | 9V      |
 | Infrared ray led | 940nm   |
 
 ### The hardware setup <div id='setup'/>
@@ -55,16 +55,18 @@ http://v.youku.com/v_show/id_XMzYzMDE0MTg1Mg==.html?spm=a2h0k.8191407.0.0&from=s
 sofware requirement
 * Visual Studio code IDE
 * ARC GNU Toolchain
-* serial port terminal eg. putty
-* Apache server , phpmysql
+* serial port terminal, eg. putty
+* Apache server, php mysql
 
 ### Makefile settings <div id='makefile'/>
-Target options about EMSK and toolchain:
+Target options about EMSK and toolchain in different makefiles:
 
-BOARD ?= emsk
-BD_VER ?= 22
-CUR_CORE ?= arcem7d
+```
+BOARD     ?= emsk
+BD_VER    ?= 22
+CUR_CORE  ?= arcem7d
 TOOLCHAIN ?= gnu
+```
 
 ## User Manual <div id='usermanual'/>
 ### Before Running This Application <div id='before'/>
@@ -75,66 +77,67 @@ Firstly, download source code of vending machine from GitHub.
 1. open the Apache HTTP server 
 2. import projectarc.sql into phpmysql(Data Base)
 3. register a new user account from our website 
- * register link: https://127.0.0.1/../server_side/sign_up.php
+    * register link: https://127.0.0.1/../server_side/sign_up.php
 
 4. change the value 'Authority' in the table 'sign_data' to 1.
 5. sign in to enter the main website
-* register link: https://127.0.0.1/../server_side/sign_in.php
+    * register link: https://127.0.0.1/../server_side/sign_in.php
 
 
 
 ### Moving Directory <div id='moving'/>
-Move the directories ```ARC_VSCODE``` and ```embarc_osp-master``` under ```D:/```
+Move the directories ```ARC_VSCODE``` and ```embarc_osp-master``` under ```D:/```.
 
 ### Launch VSCode IDE <div id='vscode'/>
 
-```D:/ARC_VSCODE/StartVSCode.bat```
-Launch StartVSCode.bat to run this vending machine application. After launching VScode, right click on the workspace and choose add Folder in the path ```D:/ARC_VSCODE/vending-machine``` to workspace. 
+1. Launch ```D:/ARC_VSCODE/StartVSCode.bat```.
+2. Add ```D:/ARC_VSCODE/vending-machine``` to workspace. 
 
 ### Wi-Fi hotspot connnection settings <div id='wifi'/>
-Modify the ssid and password of Wi-Fi AP in ``` D:/embarc_osp-master/board/emsk/emsk.h``` to connect Wi-Fi module to the hotspot
+Modify the ssid and password of Wi-Fi AP in ``` D:/embarc_osp-master/board/emsk/emsk.h``` in order to connect Wi-Fi module to the hotspot.
 
 ```clike=137
 #define WF_HOTSPOT_NAME             "EMBARC"
 #define WF_HOTSPOT_PASSWD           "12345678"
 ```
 
-### Entering Main <div id='main'/>
-After Wi-Fi connected, FREERTOS rises all tasks including communication, oled, temperature, blinky, number pad and DC motor.
+### Hardware Setting Complete <div id='hd_complete'/>
+Hardware settings is now finished. After setting up software, you can start compiling and run this application.
 
 ## Source code directory <div id='sourcecode'/>
 
-* main function directory ```src\arc_osp-master\middleware\vending-machine```
+* main function directory ```arc_osp-master\middleware\vending-machine```
 	* Include
 	* Source
-	* Readme.md
+	* README.md
 
-* ```src\arc_osp-master\middleware\vending-machine\Source```
+* ```arc_osp-master\middleware\vending-machine\Source```
 
-| FILE                 | description            |
-| -------------------: | :--------------------- |
-| vm_task.c            | main queue             |
-| communication_task.c | mbedtls ssl client     |
-| oled_task.c          | oled display           |
-| adt7420.c            | temperature sensor     |
-| dcmotor_task.c       | dc_motor controller    |
-| numpad_task.c        | user input             |
-| LED_task.c           | make the board blinky  |
-| FreeRTOSConfig.c     | Freertos configuration |
+    | FILE                       | description                            |
+    | -------------------------- | :------------------------------------- |
+    | ```vm_task.c           ``` | queue dispatcher                       |
+    | ```communication_task.c``` | mbedtls ssl client                     |
+    | ```oled_task.c         ``` | oled display                           |
+    | ```adt7420.c           ``` | implement functions temperature module |
+    | ```temp_task.c         ``` | temperature sensor                     |
+    | ```dcmotor_task.c      ``` | dc_motor controller                    |
+    | ```numpad_task.c       ``` | user input                             |
+    | ```LED_task.c          ``` | make the board blinky                  |
+    | ```FreeRTOSConfig.c    ``` | Freertos configuration                 |
 
 
 
 * ```..\server_side\```
 
-| FILE                 | description                         |
-| -------------------: | :---------------------              |
-| item.php             | change vending machine's data       |
-| item.css             | to typeset item.php                 |
-| logout.php           | logout                              |
-| read.php             | updata both side server and arc     |
-| sign_in.php          | sign into the item.php              |
-| sign_up.php          | create an account                   |
-| arc2php.txt          | exchange data from arc to server    |
-| com2arc.txt          | exchange data from server to arc    |
-| projectarc.sql       | initialize the data in the data base|
+	| FILE                 | description                          |
+	| -------------------- | :---------------------               |
+	| ```item.php      ``` | change vending machine's data        |
+	| ```item.css      ``` | to typeset item.php                  |
+	| ```logout.php    ``` | logout                               |
+	| ```read.php      ``` | updata both side server and arc      |
+	| ```sign_in.php   ``` | sign into the item.php               |
+	| ```sign_up.php   ``` | create an account                    |
+	| ```arc2php.txt   ``` | exchange data from arc to server     |
+	| ```com2arc.txt   ``` | exchange data from server to arc     |
+	| ```projectarc.sql``` | initialize the data in the data base |
 
