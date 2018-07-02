@@ -17,6 +17,7 @@
     * [Wi-Fi hotspot connnection settings](#wifi)
     * [Hardware Setting Complete](#hd_complete)
 * [Source Code Directory](#sourcecode)
+    * [File Description](#file_description)
 
 ## Introduction <div id='introduction'/>
 
@@ -104,6 +105,41 @@ Modify the ssid and password of Wi-Fi AP in ``` D:/embarc_osp-master/board/emsk/
 Settings is now finished. You can start compiling and run this application.
 
 ## Source Code Directory <div id='sourcecode'/>
+
+```
+|-- README.md
+|-- ARC_VSCODE
+    |-- .vscode
+        |-- c_cpp_properties.json
+        |-- settings.json
+    |-- Vending_Machine
+        |-- .vscode
+            |-- c_cpp_properties.json
+            |-- launch.json
+            |-- tasks.json
+        |-- Source
+            |-- main.c
+        |-- makefile
+    |-- ARC.code-workspace
+    |-- StartVSCode.bat
+|-- doc
+    |-- PIC.zip
+    |-- doc.rar
+|-- embarc_osp-master
+    |-- ...
+|-- server_side
+    |-- arc2php.txt
+    |-- com2arc.txt
+    |-- items.css
+    |-- item.php
+    |-- logout.php
+    |-- projectar.sql
+    |-- read.php
+    |-- sing_in.php
+    |-- sing_up.php
+```
+
+### File Description <div id='file_description'/>
 
 * main function directory ```arc_osp-master\middleware\vending-machine```
 	* Include
