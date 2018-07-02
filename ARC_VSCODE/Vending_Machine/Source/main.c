@@ -55,7 +55,6 @@ int main(int argc, char **argv)
 	// 實作各 main
 	// 流程都寫在這裡
 
-
     vm_data data = {0}; // data for receiveing
 	WIFI_data local_data = {0}; // local database
 	int main_status = main_user_input_1;
@@ -222,7 +221,8 @@ int main(int argc, char **argv)
 						_Wifi_Main_Enqueue(local_data);
 
 						EMBARC_PRINTF("user input: %s", data.user);
-						main_status = main_balance_check;
+						main_status = main_user_input_1;
+						// main_status = main_balance_check;
 					}
 				}
 			}
@@ -302,6 +302,7 @@ int main(int argc, char **argv)
 				}
 			}
 		}
+		vTaskDelay(20);
 	}
 
 	return E_SYS;

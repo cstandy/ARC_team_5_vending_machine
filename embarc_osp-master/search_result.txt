@@ -1,2 +1,291 @@
-board/board.c:204:			EMBARC_PRINTF("WiFi connected \r\n");
-board/board.c:230:	EMBARC_PRINTF("Wait until WiFi connected...\r\n");
+arc/arc_udma.c:48:#define DMAC_LOCK()     while (xSemaphoreTake(g_dmac->lock, portMAX_DELAY) != pdTRUE) {}
+arc/arc_udma.c:49:#define DMAC_UNLOCK()   xSemaphoreGive(g_dmac->lock)
+arc/arc_udma.c:517:	g_dmac->lock = xSemaphoreCreateMutex();
+board/board.c:260:    spi_mutex = xSemaphoreCreateBinary();
+board/board.c:261:	xSemaphoreGive(spi_mutex);
+device/ip/designware/spi/dw_spi.c:1179:			//xSemaphoreTake( spi_mutex, 10 );
+device/ip/designware/spi/dw_spi.c:1187:			//xSemaphoreGive( spi_mutex );
+device/ip/designware/spi/dw_spi.c:1202:			//xSemaphoreGive( spi_mutex );
+example/freertos/kernel/main.c:198:	mux1_id = xSemaphoreCreateMutex();
+example/freertos/kernel/main.c:201:	sem1_id = xSemaphoreCreateBinary();
+example/freertos/kernel/main.c:202:	xSemaphoreGive(sem1_id);
+example/freertos/kernel/main.c:242:		xSemaphoreTake(mux1_id, portMAX_DELAY);
+example/freertos/kernel/main.c:244:		xSemaphoreTake(sem1_id, portMAX_DELAY);
+example/freertos/kernel/main.c:253:		xSemaphoreGive(mux1_id);
+example/freertos/kernel/main.c:258:		xSemaphoreGive(sem1_id);
+example/freertos/kernel/main.c:297:		xSemaphoreTake(mux1_id, portMAX_DELAY);
+example/freertos/kernel/main.c:300:		xSemaphoreGive(mux1_id);
+example/freertos/kernel/main.c:303:		xSemaphoreTake(sem1_id, portMAX_DELAY);
+example/freertos/kernel/main.c:306:		xSemaphoreGive(sem1_id);
+inc/arc/arc_udma.h:243:	xSemaphoreHandle lock;
+middleware/aws/platform/embARC/freertos/threads_freertos_wrapper.c:35:	pMutex->lock = xSemaphoreCreateMutex();
+middleware/aws/platform/embARC/freertos/threads_freertos_wrapper.c:55:	if (xSemaphoreTake(pMutex->lock, portMAX_DELAY) != pdTRUE) {
+middleware/aws/platform/embARC/freertos/threads_freertos_wrapper.c:73:	if (xSemaphoreTake(pMutex->lock, 0) != pdTRUE) {
+middleware/aws/platform/embARC/freertos/threads_freertos_wrapper.c:90:	if (xSemaphoreGive(pMutex->lock) != pdTRUE) {
+middleware/fatfs/src/ff_syscall.c:36:	*sobj = xSemaphoreCreateMutex();	/* FreeRTOS */
+middleware/fatfs/src/ff_syscall.c:62:	xSemaphoreDelete(sobj);		/* FreeRTOS */
+middleware/fatfs/src/ff_syscall.c:87:	ret = (int)(xSemaphoreTake(sobj, _FS_TIMEOUT) == pdTRUE);	/* FreeRTOS */
+middleware/fatfs/src/ff_syscall.c:108:	xSemaphoreGive(sobj);	/* FreeRTOS */
+middleware/lwip-contrib/ports/arc/include/arch/sys_arch.h:70:typedef xSemaphoreHandle sys_sem_t;
+middleware/lwip-contrib/ports/arc/include/arch/sys_arch.h:77:typedef xSemaphoreHandle sys_mutex_t;
+middleware/lwip-contrib/ports/arc/sys_arch/freertos/sys_arch.c:61:	*mutex = xSemaphoreCreateMutex();
+middleware/lwip-contrib/ports/arc/sys_arch/freertos/sys_arch.c:77:		while (xSemaphoreTake(*mutex, portMAX_DELAY) != pdTRUE);
+middleware/lwip-contrib/ports/arc/sys_arch/freertos/sys_arch.c:85:		xSemaphoreGive(*mutex);
+middleware/lwip-contrib/ports/arc/sys_arch/freertos/sys_arch.c:131:			if (xSemaphoreTake(*sem, 1) == pdPASS) {
+middleware/lwip-contrib/ports/arc/sys_arch/freertos/sys_arch.c:153:			xSemaphoreGiveFromISR( *sem, &xHigherPriorityTaskWoken );
+middleware/lwip-contrib/ports/arc/sys_arch/freertos/sys_arch.c:155:			xSemaphoreGive( *sem );
+middleware/lwip-contrib/ports/arc/sys_arch/freertos/sys_arch.c:176:		if( xSemaphoreTake( *sem, timeout / portTICK_PERIOD_MS ) == pdTRUE ) {
+middleware/lwip-contrib/ports/arc/sys_arch/freertos/sys_arch.c:184:		while( xSemaphoreTake( *sem, portMAX_DELAY ) != pdTRUE );
+middleware/mbedtls/0001-Add-embARC-FreeRTOS-LwIP-support-to-mbedtls.patch:234:+    mutex->lock = xSemaphoreCreateMutex();
+middleware/mbedtls/0001-Add-embARC-FreeRTOS-LwIP-support-to-mbedtls.patch:257:+    while ( xSemaphoreTake(mutex->lock, portMAX_DELAY) != pdTRUE );
+middleware/mbedtls/0001-Add-embARC-FreeRTOS-LwIP-support-to-mbedtls.patch:267:+    if( xSemaphoreGive( mutex->lock ) != pdTRUE )
+middleware/mbedtls/embARC/threading_alt.c:39:    mutex->lock = xSemaphoreCreateMutex();
+middleware/mbedtls/embARC/threading_alt.c:62:    while ( xSemaphoreTake(mutex->lock, portMAX_DELAY) != pdTRUE );
+middleware/mbedtls/embARC/threading_alt.c:72:    if( xSemaphoreGive( mutex->lock ) != pdTRUE )
+middleware/vending-machine/Source/vm_task.c:7:extern SemaphoreHandle_t xSemaphore;
+os/freertos/include/event_groups.h:232:	// into the xSemaphoreCreateEventGroupStatic() function and is used to store
+os/freertos/include/FreeRTOS.h:189:#ifndef INCLUDE_xSemaphoreGetMutexHolder
+os/freertos/include/FreeRTOS.h:190:	#define INCLUDE_xSemaphoreGetMutexHolder INCLUDE_xQueueGetMutexHolder
+os/freertos/include/FreeRTOS.h:828:	#define xSemaphoreHandle SemaphoreHandle_t
+os/freertos/include/mpu_prototypes.h:135:void* MPU_xQueueGetMutexHolder( QueueHandle_t xSemaphore );
+os/freertos/include/queue.h:1555: * For internal use only.  Use xSemaphoreCreateMutex(),
+os/freertos/include/queue.h:1556: * xSemaphoreCreateCounting() or xSemaphoreGetMutexHolder() instead of calling
+os/freertos/include/queue.h:1563:void* xQueueGetMutexHolder( QueueHandle_t xSemaphore ) PRIVILEGED_FUNCTION;
+os/freertos/include/queue.h:1566: * For internal use only.  Use xSemaphoreTakeMutexRecursive() or
+os/freertos/include/queue.h:1567: * xSemaphoreGiveMutexRecursive() instead of calling these functions directly.
+os/freertos/include/semphr.h:88: * <pre>vSemaphoreCreateBinary( SemaphoreHandle_t xSemaphore )</pre>
+os/freertos/include/semphr.h:95: * xSemaphoreCreateBinary() function.  Note that binary semaphores created using
+os/freertos/include/semphr.h:98: * created using xSemaphoreCreateBinary() are created in a state such that the
+os/freertos/include/semphr.h:111: * that does use priority inheritance see xSemaphoreCreateMutex().
+os/freertos/include/semphr.h:113: * @param xSemaphore Handle to the created semaphore.  Should be of type SemaphoreHandle_t.
+os/freertos/include/semphr.h:117: SemaphoreHandle_t xSemaphore = NULL;
+os/freertos/include/semphr.h:123:    vSemaphoreCreateBinary( xSemaphore );
+os/freertos/include/semphr.h:125:    if( xSemaphore != NULL )
+os/freertos/include/semphr.h:136:	#define vSemaphoreCreateBinary( xSemaphore )																							\
+os/freertos/include/semphr.h:138:			( xSemaphore ) = xQueueGenericCreate( ( UBaseType_t ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH, queueQUEUE_TYPE_BINARY_SEMAPHORE );	\
+os/freertos/include/semphr.h:139:			if( ( xSemaphore ) != NULL )																									\
+os/freertos/include/semphr.h:141:				( void ) xSemaphoreGive( ( xSemaphore ) );																					\
+os/freertos/include/semphr.h:148: * <pre>SemaphoreHandle_t xSemaphoreCreateBinary( void )</pre>
+os/freertos/include/semphr.h:159: * is created using xSemaphoreCreateBinary() then the required memory is
+os/freertos/include/semphr.h:160: * automatically dynamically allocated inside the xSemaphoreCreateBinary()
+os/freertos/include/semphr.h:162: * is created using xSemaphoreCreateBinaryStatic() then the application writer
+os/freertos/include/semphr.h:163: * must provide the memory.  xSemaphoreCreateBinaryStatic() therefore allows a
+os/freertos/include/semphr.h:167: * xSemaphoreCreateBinary() function.  Note that binary semaphores created using
+os/freertos/include/semphr.h:170: * created using xSemaphoreCreateBinary() are created in a state such that the
+os/freertos/include/semphr.h:178: * that does use priority inheritance see xSemaphoreCreateMutex().
+os/freertos/include/semphr.h:185: SemaphoreHandle_t xSemaphore = NULL;
+os/freertos/include/semphr.h:189:    // Semaphore cannot be used before a call to xSemaphoreCreateBinary().
+os/freertos/include/semphr.h:191:    xSemaphore = xSemaphoreCreateBinary();
+os/freertos/include/semphr.h:193:    if( xSemaphore != NULL )
+os/freertos/include/semphr.h:200: * \defgroup xSemaphoreCreateBinary xSemaphoreCreateBinary
+os/freertos/include/semphr.h:204:	#define xSemaphoreCreateBinary() xQueueGenericCreate( ( UBaseType_t ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH, queueQUEUE_TYPE_BINARY_SEMAPHORE )
+os/freertos/include/semphr.h:209: * <pre>SemaphoreHandle_t xSemaphoreCreateBinaryStatic( StaticSemaphore_t *pxSemaphoreBuffer )</pre>
+os/freertos/include/semphr.h:220: * is created using xSemaphoreCreateBinary() then the required memory is
+os/freertos/include/semphr.h:221: * automatically dynamically allocated inside the xSemaphoreCreateBinary()
+os/freertos/include/semphr.h:223: * is created using xSemaphoreCreateBinaryStatic() then the application writer
+os/freertos/include/semphr.h:224: * must provide the memory.  xSemaphoreCreateBinaryStatic() therefore allows a
+os/freertos/include/semphr.h:232: * that does use priority inheritance see xSemaphoreCreateMutex().
+os/freertos/include/semphr.h:234: * @param pxSemaphoreBuffer Must point to a variable of type StaticSemaphore_t,
+os/freertos/include/semphr.h:239: * returned.  If pxSemaphoreBuffer is NULL then NULL is returned.
+os/freertos/include/semphr.h:243: SemaphoreHandle_t xSemaphore = NULL;
+os/freertos/include/semphr.h:244: StaticSemaphore_t xSemaphoreBuffer;
+os/freertos/include/semphr.h:248:    // Semaphore cannot be used before a call to xSemaphoreCreateBinary().
+os/freertos/include/semphr.h:249:    // The semaphore's data structures will be placed in the xSemaphoreBuffer
+os/freertos/include/semphr.h:254:    xSemaphore = xSemaphoreCreateBinary( &xSemaphoreBuffer );
+os/freertos/include/semphr.h:259: * \defgroup xSemaphoreCreateBinaryStatic xSemaphoreCreateBinaryStatic
+os/freertos/include/semphr.h:263:	#define xSemaphoreCreateBinaryStatic( pxStaticSemaphore ) xQueueGenericCreateStatic( ( UBaseType_t ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH, NULL, pxStaticSemaphore, queueQUEUE_TYPE_BINARY_SEMAPHORE )
+os/freertos/include/semphr.h:268: * <pre>xSemaphoreTake(
+os/freertos/include/semphr.h:269: *                   SemaphoreHandle_t xSemaphore,
+os/freertos/include/semphr.h:274: * created with a call to xSemaphoreCreateBinary(), xSemaphoreCreateMutex() or
+os/freertos/include/semphr.h:275: * xSemaphoreCreateCounting().
+os/freertos/include/semphr.h:277: * @param xSemaphore A handle to the semaphore being taken - obtained when
+os/freertos/include/semphr.h:291: SemaphoreHandle_t xSemaphore = NULL;
+os/freertos/include/semphr.h:297:    xSemaphore = xSemaphoreCreateBinary();
+os/freertos/include/semphr.h:305:    if( xSemaphore != NULL )
+os/freertos/include/semphr.h:309:        if( xSemaphoreTake( xSemaphore, ( TickType_t ) 10 ) == pdTRUE )
+os/freertos/include/semphr.h:318:            xSemaphoreGive( xSemaphore );
+os/freertos/include/semphr.h:328: * \defgroup xSemaphoreTake xSemaphoreTake
+os/freertos/include/semphr.h:331:#define xSemaphoreTake( xSemaphore, xBlockTime )		xQueueGenericReceive( ( QueueHandle_t ) ( xSemaphore ), NULL, ( xBlockTime ), pdFALSE )
+os/freertos/include/semphr.h:335: * xSemaphoreTakeRecursive(
+os/freertos/include/semphr.h:342: * xSemaphoreCreateRecursiveMutex();
+os/freertos/include/semphr.h:347: * This macro must not be used on mutexes created using xSemaphoreCreateMutex().
+os/freertos/include/semphr.h:351: * xSemaphoreGiveRecursive() for each successful 'take' request.  For example,
+os/freertos/include/semphr.h:357: * handle returned by xSemaphoreCreateRecursiveMutex();
+os/freertos/include/semphr.h:362: * the task already owns the semaphore then xSemaphoreTakeRecursive() will
+os/freertos/include/semphr.h:376:    xMutex = xSemaphoreCreateRecursiveMutex();
+os/freertos/include/semphr.h:388:        if( xSemaphoreTakeRecursive( xSemaphore, ( TickType_t ) 10 ) == pdTRUE )
+os/freertos/include/semphr.h:395:			// xSemaphoreTakeRecursive() are made on the same mutex.  In real
+os/freertos/include/semphr.h:399:            xSemaphoreTakeRecursive( xMutex, ( TickType_t ) 10 );
+os/freertos/include/semphr.h:400:            xSemaphoreTakeRecursive( xMutex, ( TickType_t ) 10 );
+os/freertos/include/semphr.h:407:            xSemaphoreGiveRecursive( xMutex );
+os/freertos/include/semphr.h:408:			xSemaphoreGiveRecursive( xMutex );
+os/freertos/include/semphr.h:409:			xSemaphoreGiveRecursive( xMutex );
+os/freertos/include/semphr.h:421: * \defgroup xSemaphoreTakeRecursive xSemaphoreTakeRecursive
+os/freertos/include/semphr.h:425:	#define xSemaphoreTakeRecursive( xMutex, xBlockTime )	xQueueTakeMutexRecursive( ( xMutex ), ( xBlockTime ) )
+os/freertos/include/semphr.h:430: * <pre>xSemaphoreGive( SemaphoreHandle_t xSemaphore )</pre>
+os/freertos/include/semphr.h:433: * created with a call to xSemaphoreCreateBinary(), xSemaphoreCreateMutex() or
+os/freertos/include/semphr.h:434: * xSemaphoreCreateCounting(). and obtained using sSemaphoreTake().
+os/freertos/include/semphr.h:436: * This macro must not be used from an ISR.  See xSemaphoreGiveFromISR () for
+os/freertos/include/semphr.h:440: * xSemaphoreCreateRecursiveMutex().
+os/freertos/include/semphr.h:442: * @param xSemaphore A handle to the semaphore being released.  This is the
+os/freertos/include/semphr.h:452: SemaphoreHandle_t xSemaphore = NULL;
+os/freertos/include/semphr.h:457:    xSemaphore = vSemaphoreCreateBinary();
+os/freertos/include/semphr.h:459:    if( xSemaphore != NULL )
+os/freertos/include/semphr.h:461:        if( xSemaphoreGive( xSemaphore ) != pdTRUE )
+os/freertos/include/semphr.h:469:        if( xSemaphoreTake( xSemaphore, ( TickType_t ) 0 ) )
+os/freertos/include/semphr.h:477:            if( xSemaphoreGive( xSemaphore ) != pdTRUE )
+os/freertos/include/semphr.h:486: * \defgroup xSemaphoreGive xSemaphoreGive
+os/freertos/include/semphr.h:489:#define xSemaphoreGive( xSemaphore )		xQueueGenericSend( ( QueueHandle_t ) ( xSemaphore ), NULL, semGIVE_BLOCK_TIME, queueSEND_TO_BACK )
+os/freertos/include/semphr.h:493: * <pre>xSemaphoreGiveRecursive( SemaphoreHandle_t xMutex )</pre>
+os/freertos/include/semphr.h:497: * xSemaphoreCreateRecursiveMutex();
+os/freertos/include/semphr.h:502: * This macro must not be used on mutexes created using xSemaphoreCreateMutex().
+os/freertos/include/semphr.h:506: * xSemaphoreGiveRecursive() for each successful 'take' request.  For example,
+os/freertos/include/semphr.h:512: * handle returned by xSemaphoreCreateMutex();
+os/freertos/include/semphr.h:524:    xMutex = xSemaphoreCreateRecursiveMutex();
+os/freertos/include/semphr.h:536:        if( xSemaphoreTakeRecursive( xMutex, ( TickType_t ) 10 ) == pdTRUE )
+os/freertos/include/semphr.h:543:			// xSemaphoreTakeRecursive() are made on the same mutex.  In real
+os/freertos/include/semphr.h:547:            xSemaphoreTakeRecursive( xMutex, ( TickType_t ) 10 );
+os/freertos/include/semphr.h:548:            xSemaphoreTakeRecursive( xMutex, ( TickType_t ) 10 );
+os/freertos/include/semphr.h:554:			// to xSemaphoreGiveRecursive() would be called as a call stack
+os/freertos/include/semphr.h:556:            xSemaphoreGiveRecursive( xMutex );
+os/freertos/include/semphr.h:557:			xSemaphoreGiveRecursive( xMutex );
+os/freertos/include/semphr.h:558:			xSemaphoreGiveRecursive( xMutex );
+os/freertos/include/semphr.h:570: * \defgroup xSemaphoreGiveRecursive xSemaphoreGiveRecursive
+os/freertos/include/semphr.h:574:	#define xSemaphoreGiveRecursive( xMutex )	xQueueGiveMutexRecursive( ( xMutex ) )
+os/freertos/include/semphr.h:580: xSemaphoreGiveFromISR(
+os/freertos/include/semphr.h:581:                          SemaphoreHandle_t xSemaphore,
+os/freertos/include/semphr.h:586: * created with a call to xSemaphoreCreateBinary() or xSemaphoreCreateCounting().
+os/freertos/include/semphr.h:588: * Mutex type semaphores (those created using a call to xSemaphoreCreateMutex())
+os/freertos/include/semphr.h:593: * @param xSemaphore A handle to the semaphore being released.  This is the
+os/freertos/include/semphr.h:596: * @param pxHigherPriorityTaskWoken xSemaphoreGiveFromISR() will set
+os/freertos/include/semphr.h:599: * running task.  If xSemaphoreGiveFromISR() sets this value to pdTRUE then
+os/freertos/include/semphr.h:608: SemaphoreHandle_t xSemaphore = NULL;
+os/freertos/include/semphr.h:619:        if( xSemaphoreTake( xSemaphore, LONG_TIME ) == pdTRUE )
+os/freertos/include/semphr.h:649:        xSemaphoreGiveFromISR( xSemaphore, &xHigherPriorityTaskWoken );
+os/freertos/include/semphr.h:663: * \defgroup xSemaphoreGiveFromISR xSemaphoreGiveFromISR
+os/freertos/include/semphr.h:666:#define xSemaphoreGiveFromISR( xSemaphore, pxHigherPriorityTaskWoken )	xQueueGiveFromISR( ( QueueHandle_t ) ( xSemaphore ), ( pxHigherPriorityTaskWoken ) )
+os/freertos/include/semphr.h:671: xSemaphoreTakeFromISR(
+os/freertos/include/semphr.h:672:                          SemaphoreHandle_t xSemaphore,
+os/freertos/include/semphr.h:677: * previously been created with a call to xSemaphoreCreateBinary() or
+os/freertos/include/semphr.h:678: * xSemaphoreCreateCounting().
+os/freertos/include/semphr.h:680: * Mutex type semaphores (those created using a call to xSemaphoreCreateMutex())
+os/freertos/include/semphr.h:688: * @param xSemaphore A handle to the semaphore being taken.  This is the
+os/freertos/include/semphr.h:691: * @param pxHigherPriorityTaskWoken xSemaphoreTakeFromISR() will set
+os/freertos/include/semphr.h:694: * running task.  If xSemaphoreTakeFromISR() sets this value to pdTRUE then
+os/freertos/include/semphr.h:700:#define xSemaphoreTakeFromISR( xSemaphore, pxHigherPriorityTaskWoken )	xQueueReceiveFromISR( ( QueueHandle_t ) ( xSemaphore ), NULL, ( pxHigherPriorityTaskWoken ) )
+os/freertos/include/semphr.h:704: * <pre>SemaphoreHandle_t xSemaphoreCreateMutex( void )</pre>
+os/freertos/include/semphr.h:711: * using xSemaphoreCreateMutex() then the required memory is automatically
+os/freertos/include/semphr.h:712: * dynamically allocated inside the xSemaphoreCreateMutex() function.  (see
+os/freertos/include/semphr.h:714: * xSemaphoreCreateMutexStatic() then the application writer must provided the
+os/freertos/include/semphr.h:715: * memory.  xSemaphoreCreateMutexStatic() therefore allows a mutex to be created
+os/freertos/include/semphr.h:718: * Mutexes created using this function can be accessed using the xSemaphoreTake()
+os/freertos/include/semphr.h:719: * and xSemaphoreGive() macros.  The xSemaphoreTakeRecursive() and
+os/freertos/include/semphr.h:720: * xSemaphoreGiveRecursive() macros must not be used.
+os/freertos/include/semphr.h:728: * See xSemaphoreCreateBinary() for an alternative implementation that can be
+os/freertos/include/semphr.h:739: SemaphoreHandle_t xSemaphore;
+os/freertos/include/semphr.h:743:    // Semaphore cannot be used before a call to xSemaphoreCreateMutex().
+os/freertos/include/semphr.h:745:    xSemaphore = xSemaphoreCreateMutex();
+os/freertos/include/semphr.h:747:    if( xSemaphore != NULL )
+os/freertos/include/semphr.h:754: * \defgroup xSemaphoreCreateMutex xSemaphoreCreateMutex
+os/freertos/include/semphr.h:758:	#define xSemaphoreCreateMutex() xQueueCreateMutex( queueQUEUE_TYPE_MUTEX )
+os/freertos/include/semphr.h:763: * <pre>SemaphoreHandle_t xSemaphoreCreateMutexStatic( StaticSemaphore_t *pxMutexBuffer )</pre>
+os/freertos/include/semphr.h:770: * using xSemaphoreCreateMutex() then the required memory is automatically
+os/freertos/include/semphr.h:771: * dynamically allocated inside the xSemaphoreCreateMutex() function.  (see
+os/freertos/include/semphr.h:773: * xSemaphoreCreateMutexStatic() then the application writer must provided the
+os/freertos/include/semphr.h:774: * memory.  xSemaphoreCreateMutexStatic() therefore allows a mutex to be created
+os/freertos/include/semphr.h:777: * Mutexes created using this function can be accessed using the xSemaphoreTake()
+os/freertos/include/semphr.h:778: * and xSemaphoreGive() macros.  The xSemaphoreTakeRecursive() and
+os/freertos/include/semphr.h:779: * xSemaphoreGiveRecursive() macros must not be used.
+os/freertos/include/semphr.h:787: * See xSemaphoreCreateBinary() for an alternative implementation that can be
+os/freertos/include/semphr.h:801: SemaphoreHandle_t xSemaphore;
+os/freertos/include/semphr.h:807:    // into xSemaphoreCreateMutexStatic() so no dynamic memory allocation is
+os/freertos/include/semphr.h:809:    xSemaphore = xSemaphoreCreateMutexStatic( &xMutexBuffer );
+os/freertos/include/semphr.h:811:    // As no dynamic memory allocation was performed, xSemaphore cannot be NULL,
+os/freertos/include/semphr.h:815: * \defgroup xSemaphoreCreateMutexStatic xSemaphoreCreateMutexStatic
+os/freertos/include/semphr.h:819:	#define xSemaphoreCreateMutexStatic( pxMutexBuffer ) xQueueCreateMutexStatic( queueQUEUE_TYPE_MUTEX, ( pxMutexBuffer ) )
+os/freertos/include/semphr.h:825: * <pre>SemaphoreHandle_t xSemaphoreCreateRecursiveMutex( void )</pre>
+os/freertos/include/semphr.h:832: * created using xSemaphoreCreateRecursiveMutex() then the required memory is
+os/freertos/include/semphr.h:834: * xSemaphoreCreateRecursiveMutex() function.  (see
+os/freertos/include/semphr.h:836: * xSemaphoreCreateRecursiveMutexStatic() then the application writer must
+os/freertos/include/semphr.h:838: * xSemaphoreCreateRecursiveMutexStatic() therefore allows a recursive mutex to
+os/freertos/include/semphr.h:842: * xSemaphoreTakeRecursive() and xSemaphoreGiveRecursive() macros.  The
+os/freertos/include/semphr.h:843: * xSemaphoreTake() and xSemaphoreGive() macros must not be used.
+os/freertos/include/semphr.h:847: * xSemaphoreGiveRecursive() for each successful 'take' request.  For example,
+os/freertos/include/semphr.h:858: * See xSemaphoreCreateBinary() for an alternative implementation that can be
+os/freertos/include/semphr.h:863: * @return xSemaphore Handle to the created mutex semaphore.  Should be of type
+os/freertos/include/semphr.h:868: SemaphoreHandle_t xSemaphore;
+os/freertos/include/semphr.h:872:    // Semaphore cannot be used before a call to xSemaphoreCreateMutex().
+os/freertos/include/semphr.h:874:    xSemaphore = xSemaphoreCreateRecursiveMutex();
+os/freertos/include/semphr.h:876:    if( xSemaphore != NULL )
+os/freertos/include/semphr.h:883: * \defgroup xSemaphoreCreateRecursiveMutex xSemaphoreCreateRecursiveMutex
+os/freertos/include/semphr.h:887:	#define xSemaphoreCreateRecursiveMutex() xQueueCreateMutex( queueQUEUE_TYPE_RECURSIVE_MUTEX )
+os/freertos/include/semphr.h:892: * <pre>SemaphoreHandle_t xSemaphoreCreateRecursiveMutexStatic( StaticSemaphore_t *pxMutexBuffer )</pre>
+os/freertos/include/semphr.h:899: * created using xSemaphoreCreateRecursiveMutex() then the required memory is
+os/freertos/include/semphr.h:901: * xSemaphoreCreateRecursiveMutex() function.  (see
+os/freertos/include/semphr.h:903: * xSemaphoreCreateRecursiveMutexStatic() then the application writer must
+os/freertos/include/semphr.h:905: * xSemaphoreCreateRecursiveMutexStatic() therefore allows a recursive mutex to
+os/freertos/include/semphr.h:909: * xSemaphoreTakeRecursive() and xSemaphoreGiveRecursive() macros.  The
+os/freertos/include/semphr.h:910: * xSemaphoreTake() and xSemaphoreGive() macros must not be used.
+os/freertos/include/semphr.h:914: * xSemaphoreGiveRecursive() for each successful 'take' request.  For example,
+os/freertos/include/semphr.h:925: * See xSemaphoreCreateBinary() for an alternative implementation that can be
+os/freertos/include/semphr.h:940: SemaphoreHandle_t xSemaphore;
+os/freertos/include/semphr.h:946:    // recursive mutex is created using xSemaphoreCreateRecursiveMutexStatic().
+os/freertos/include/semphr.h:950:    xSemaphore = xSemaphoreCreateRecursiveMutexStatic( &xMutexBuffer );
+os/freertos/include/semphr.h:952:    // As no dynamic memory allocation was performed, xSemaphore cannot be NULL,
+os/freertos/include/semphr.h:956: * \defgroup xSemaphoreCreateRecursiveMutexStatic xSemaphoreCreateRecursiveMutexStatic
+os/freertos/include/semphr.h:960:	#define xSemaphoreCreateRecursiveMutexStatic( pxStaticSemaphore ) xQueueCreateMutexStatic( queueQUEUE_TYPE_RECURSIVE_MUTEX, pxStaticSemaphore )
+os/freertos/include/semphr.h:965: * <pre>SemaphoreHandle_t xSemaphoreCreateCounting( UBaseType_t uxMaxCount, UBaseType_t uxInitialCount )</pre>
+os/freertos/include/semphr.h:976: * counting semaphore is created using xSemaphoreCreateCounting() then the
+os/freertos/include/semphr.h:978: * xSemaphoreCreateCounting() function.  (see
+os/freertos/include/semphr.h:980: * using xSemaphoreCreateCountingStatic() then the application writer can
+os/freertos/include/semphr.h:982: * semaphore.  xSemaphoreCreateCountingStatic() therefore allows a counting
+os/freertos/include/semphr.h:1018: SemaphoreHandle_t xSemaphore;
+os/freertos/include/semphr.h:1022: SemaphoreHandle_t xSemaphore = NULL;
+os/freertos/include/semphr.h:1024:    // Semaphore cannot be used before a call to xSemaphoreCreateCounting().
+os/freertos/include/semphr.h:1027:    xSemaphore = xSemaphoreCreateCounting( 10, 0 );
+os/freertos/include/semphr.h:1029:    if( xSemaphore != NULL )
+os/freertos/include/semphr.h:1036: * \defgroup xSemaphoreCreateCounting xSemaphoreCreateCounting
+os/freertos/include/semphr.h:1040:	#define xSemaphoreCreateCounting( uxMaxCount, uxInitialCount ) xQueueCreateCountingSemaphore( ( uxMaxCount ), ( uxInitialCount ) )
+os/freertos/include/semphr.h:1045: * <pre>SemaphoreHandle_t xSemaphoreCreateCountingStatic( UBaseType_t uxMaxCount, UBaseType_t uxInitialCount, StaticSemaphore_t *pxSemaphoreBuffer )</pre>
+os/freertos/include/semphr.h:1056: * counting semaphore is created using xSemaphoreCreateCounting() then the
+os/freertos/include/semphr.h:1058: * xSemaphoreCreateCounting() function.  (see
+os/freertos/include/semphr.h:1060: * using xSemaphoreCreateCountingStatic() then the application writer must
+os/freertos/include/semphr.h:1061: * provide the memory.  xSemaphoreCreateCountingStatic() therefore allows a
+os/freertos/include/semphr.h:1092: * @param pxSemaphoreBuffer Must point to a variable of type StaticSemaphore_t,
+os/freertos/include/semphr.h:1097: * the created counting semaphore is returned.  If pxSemaphoreBuffer was NULL
+os/freertos/include/semphr.h:1102: SemaphoreHandle_t xSemaphore;
+os/freertos/include/semphr.h:1103: StaticSemaphore_t xSemaphoreBuffer;
+os/freertos/include/semphr.h:1107: SemaphoreHandle_t xSemaphore = NULL;
+os/freertos/include/semphr.h:1110:    // a counting semaphore using xSemaphoreCreateCountingStatic().  The max
+os/freertos/include/semphr.h:1112:    // assigned to the count will be 0.  The address of xSemaphoreBuffer is
+os/freertos/include/semphr.h:1115:    xSemaphore = xSemaphoreCreateCounting( 10, 0, &xSemaphoreBuffer );
+os/freertos/include/semphr.h:1117:    // No memory allocation was attempted so xSemaphore cannot be NULL, so there
+os/freertos/include/semphr.h:1121: * \defgroup xSemaphoreCreateCountingStatic xSemaphoreCreateCountingStatic
+os/freertos/include/semphr.h:1125:	#define xSemaphoreCreateCountingStatic( uxMaxCount, uxInitialCount, pxSemaphoreBuffer ) xQueueCreateCountingSemaphoreStatic( ( uxMaxCount ), ( uxInitialCount ), ( pxSemaphoreBuffer ) )
+os/freertos/include/semphr.h:1130: * <pre>void vSemaphoreDelete( SemaphoreHandle_t xSemaphore );</pre>
+os/freertos/include/semphr.h:1135: * @param xSemaphore A handle to the semaphore to be deleted.
+os/freertos/include/semphr.h:1140:#define vSemaphoreDelete( xSemaphore ) vQueueDelete( ( QueueHandle_t ) ( xSemaphore ) )
+os/freertos/include/semphr.h:1144: * <pre>TaskHandle_t xSemaphoreGetMutexHolder( SemaphoreHandle_t xMutex );</pre>
+os/freertos/include/semphr.h:1155:#define xSemaphoreGetMutexHolder( xSemaphore ) xQueueGetMutexHolder( ( xSemaphore ) )
+os/freertos/include/semphr.h:1159: * <pre>UBaseType_t uxSemaphoreGetCount( SemaphoreHandle_t xSemaphore );</pre>
+os/freertos/include/semphr.h:1161: * If the semaphore is a counting semaphore then uxSemaphoreGetCount() returns
+os/freertos/include/semphr.h:1163: * uxSemaphoreGetCount() returns 1 if the semaphore is available, and 0 if the
+os/freertos/include/semphr.h:1167:#define uxSemaphoreGetCount( xSemaphore ) uxQueueMessagesWaiting( ( QueueHandle_t ) ( xSemaphore ) )
+os/freertos/include/task.h:1903: * Actual FreeRTOS semaphores are given using the xSemaphoreGive() API function,
+os/freertos/include/task.h:1953: * xSemaphoreGiveFromISR() API function, the equivalent action that instead uses
+os/freertos/include/task.h:2004: * FreeRTOS semaphores are taken using the xSemaphoreTake() API function, the
+os/freertos/portable/Synopsys/ARC/freertos_tls.c:214:typedef xSemaphoreHandle _lock_t;
+os/freertos/portable/Synopsys/ARC/freertos_tls.c:221:	*mutex_ptr = xSemaphoreCreateRecursiveMutex();
+os/freertos/portable/Synopsys/ARC/freertos_tls.c:234:		while (xSemaphoreTakeRecursive(mutex, portMAX_DELAY) != pdTRUE);
+os/freertos/portable/Synopsys/ARC/freertos_tls.c:241:		xSemaphoreGiveRecursive(mutex);
+os/freertos/portable/Synopsys/ARC_EM_SECURESHIELD/freertos_tls.c:214:typedef xSemaphoreHandle _lock_t;
+os/freertos/portable/Synopsys/ARC_EM_SECURESHIELD/freertos_tls.c:221:	*mutex_ptr = xSemaphoreCreateRecursiveMutex();
+os/freertos/portable/Synopsys/ARC_EM_SECURESHIELD/freertos_tls.c:234:		while (xSemaphoreTakeRecursive(mutex, portMAX_DELAY) != pdTRUE);
+os/freertos/portable/Synopsys/ARC_EM_SECURESHIELD/freertos_tls.c:241:		xSemaphoreGiveRecursive(mutex);
+os/freertos/queue.c:540:#if ( ( configUSE_MUTEXES == 1 ) && ( INCLUDE_xSemaphoreGetMutexHolder == 1 ) )
+os/freertos/queue.c:542:	void* xQueueGetMutexHolder( QueueHandle_t xSemaphore )
+os/freertos/queue.c:546:		/* This function is called by xSemaphoreGetMutexHolder(), and should not
+os/freertos/queue.c:553:			if( ( ( Queue_t * ) xSemaphore )->uxQueueType == queueQUEUE_IS_MUTEX )
+os/freertos/queue.c:555:				pxReturn = ( void * ) ( ( Queue_t * ) xSemaphore )->pxMutexHolder;
+os/freertos/queue.c:565:	} /*lint !e818 xSemaphore cannot be a pointer to const because it is a typedef. */
+os/freertos/tasks.c:4180:		/* If xSemaphoreCreateMutex() is called before any tasks have been created

@@ -4,20 +4,22 @@
 
 #include "vm_task.h"
 
-extern SemaphoreHandle_t xSemaphore;
+extern SemaphoreHandle_t vm_queue_mutex;
 
 void enQueue(vm_data data)
 {
-    while(1) {
-        if( xQueueSend(xVMQueue, &data, 0) == pdTRUE )
-            break;
-        vTaskDelay(1);
-    }
+    BaseType_t ret;
+    do{
+        xSemaphoreTake(vm_queue_mutex, portMAX_DELAY);
+        ret = xQueueSendToBack(xVMQueue, &data, 20);
+        xSemaphoreGive(vm_queue_mutex);
+    } while(ret != pdTRUE);
 }
 
 
 void vm_task(void *p_arg)
 {
+    BaseType_t ret;
     EMBARC_PRINTF("entering vm task\r\n");
     vm_data data = {0};
 
@@ -26,29 +28,25 @@ void vm_task(void *p_arg)
 
     while (1)
     {
-        if (xQueueReceive( xVMQueue, &data, 0 ) == pdTRUE)
+        //xSemaphoreTake(vm_queue_mutex, portMAX_DELAY);
+        ret = xQueueReceive( xVMQueue, &data, portMAX_DELAY );
+        //xSemaphoreGive(vm_queue_mutex);
+        if (ret == pdTRUE)
         {
             switch (data.target_id)
             {
                 case id_main:
-                    while (1)
-                        if (xQueueSend(xMainQueue, &data, 0) == pdTRUE)
-                            break;
+                    xQueueSend(xMainQueue, &data, portMAX_DELAY);
                     break;
+                /*
                 case id_wifi:
-                    while (1)
-                        if (xQueueSend(xCommunicationQueue, &data, 0) == pdTRUE)
-                            break;
-                    break;
+                    xQueueSend(xCommunicationQueue, &data, portMAX_DELAY);
+                    break;*/
                 case id_dcmotor:
-                    while (1)
-                        if (xQueueSend(xDCmotorQueue, &data, 0) == pdTRUE)
-                            break;
+                    xQueueSend(xDCmotorQueue, &data, portMAX_DELAY);
                     break;
                 case id_oled:
-                    while (1)
-                        if (xQueueSend(xOledQueue, &data, 0) == pdTRUE)
-                            break;
+                    xQueueSend(xOledQueue, &data, portMAX_DELAY);
                     break;
             }
         }

@@ -197,7 +197,7 @@ void io_mux_init(void)
 	 *   - PM5 J5: Upper row as SPI Master, lower row as Port A
 	 *   - PM6 J6: Upper row as SPI Master, lower row as Port A
 	 */
-	set_pmod_mux(PM1_UR_UART_0 | PM1_LR_SPI_S	\
+	set_pmod_mux(PM1_UR_GPIO_C | PM1_LR_GPIO_A	\
 				| PM2_I2C_HRI		\
 				| PM3_GPIO_AC		\
 				| PM4_I2C_GPIO_D	\

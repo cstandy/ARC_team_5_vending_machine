@@ -20,7 +20,7 @@ int user_receive_status = 0;
 vm_data oled_data = {0};
 
 enum oled_status_list {
-	normal, input_1, input_2, input_3, input_4, recommand, check, confirm
+	normal = 0, input_1, input_2, input_3, input_4, recommand, check, confirm
 };
 // ********************************************************************************
 
@@ -100,11 +100,11 @@ void u8g_test(int index) {
 void u8g_cover(void) {
 	static char buffer[30];
 	u8g_SetFont(&u8g, u8g_font_gdr20);
-	u8g_DrawStr(&u8g, 0, 35, "NCKUEE");
+	u8g_DrawStr(&u8g, 0, 25, "NCKUEE");
 	u8g_SetFont(&u8g, u8g_font_6x10);
-	u8g_DrawStr(&u8g, 0, 50, "Vending Machine...");
-	xsprintf(buffer, "since 2018/05/27");
-	u8g_DrawStr(&u8g, 0, 60, buffer);
+	u8g_DrawStr(&u8g, 0, 40, "Vending Machine...");
+	u8g_DrawStr(&u8g, 0, 50, "Please enter your user");
+	u8g_DrawStr(&u8g, 0, 60, "account.");
 }
 
 void u8g_recommand(void) {
@@ -162,15 +162,15 @@ void draw(void) {
 		//case 4: u8g_ascii_2(); break;
 		case 3: u8g_test_1(); break;
 	}*/
-	switch (oled_status >> 3){
-		case normal:    u8g_cover(); break;
-		case input_1:   u8g_input(0); break;
-		case input_2:   u8g_input(1); break;
-		case input_3:   u8g_input(2); break;
-		case input_4:   u8g_input(3); break;
+	switch (oled_status){
+		case normal:    u8g_cover();     break;
+		case input_1:   u8g_input(0);    break;
+		case input_2:   u8g_input(1);    break;
+		case input_3:   u8g_input(2);    break;
+		case input_4:   u8g_input(3);    break;
 		case recommand: u8g_recommand(); break;
-		case check:     u8g_check(); break;
-		case confirm:   u8g_confirm(); break;
+		case check:     u8g_check();     break;
+		case confirm:   u8g_confirm();   break;
 	}
 	
 }
@@ -219,7 +219,8 @@ void oled_task(void *p_arg)
 		// ********************************************************************************
 		// decode the queue if there is new data receive
 
-		oled_status = draw_state;
+		if (oled_status > 7)
+			oled_status = 0;
 
 		if( xOledQueue != 0 )	
 		{
@@ -228,13 +229,16 @@ void oled_task(void *p_arg)
 				if (oled_data.source_id == id_temp)
 				{
 					sprintf(temp, "%*.*lf", 2, 2, oled_data.body[0].f);
-					EMBARC_PRINTF("oled receive temp: %s\r\n", temp);
+					// EMBARC_PRINTF("oled receive temp: %s\r\n", temp);
 				}
-				else if (oled_data.source_id == id_numpad)
+				// else if (oled_data.source_id == id_numpad)
+				else if (oled_data.source_id == id_main)
 				{
 					if (user_receive_status == 4) user_receive_status = 0;
-					user[user_receive_status % 4] = (char)oled_data.body[0].i;
-					user_receive_status++;
+					user[user_receive_status] = (char)oled_data.body[0].i;
+					++user_receive_status;
+
+					++oled_status;
 				}
 				else if (oled_data.source_id == id_wifi)
 				{
@@ -253,13 +257,13 @@ void oled_task(void *p_arg)
 							number[i] = oled_data.body[0].i;
 							sprintf(type[i], "%s", oled_data.type);
 							sprintf(name[i], "%s", oled_data.name);
-							EMBARC_PRINTF("oled receive temp: %s\r\n", oled_data.type);
-							EMBARC_PRINTF("oled receive temp: %s\r\n", oled_data.name);
+							EMBARC_PRINTF("oled receive data type: %s\r\n", oled_data.type);
+							EMBARC_PRINTF("oled receive data name: %s\r\n", oled_data.name);
 						}
 					}
 				}
 			}
 		}
-		vTaskDelay(0);
+		vTaskDelay(100);
 	}
 }

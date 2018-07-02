@@ -3,6 +3,7 @@
 #include "embARC_debug.h"
 
 #include "vm_task.h"
+
 #define J3_PIN7to10_MASK_A 0xf0000
 #define J3_PIN1to4_MASK_C  0xf0000
 #define false			   0
@@ -59,7 +60,7 @@ void numpad_task(void *p_arg)
 	uint32_t buffer;
 
 	int i, j;
-	/*
+	
 	while(1){
 		for(i= 0; i < 4; i ++){
 			//scan 4 rows
@@ -77,8 +78,10 @@ void numpad_task(void *p_arg)
 						Numpad_table[i][j].release_time = board_get_cur_us();
 						//EMBARC_PRINTF("%d,%d\r\n",i,j);
 						if((Numpad_table[i][j].release_time - Numpad_table[i][j].press_time) >= 100000ul) {
-							//EMBARC_PRINTF("%c\n", Numpad_Convert[i*4+j]);
-							_Npad_Enqueue(id_main, (int) Numpad_Convert[i*4+j]);
+							EMBARC_PRINTF("%c\n", Numpad_Convert[i*4+j]);
+							_Npad_Enqueue(id_main,    (int) Numpad_Convert[i*4+j]);
+							// _Npad_Enqueue(id_oled,    (int) Numpad_Convert[i*4+j]);
+							_Npad_Enqueue(id_dcmotor, (int) Numpad_Convert[i*4+j]);
 						}
 						Numpad_table[i][j].ispress = false;
 					} 
@@ -92,54 +95,6 @@ void numpad_task(void *p_arg)
 			}
 			numpad_row->gpio_control(GPIO_CMD_SET_BIT_DIR_INPUT, (void *)(J3_PIN1to4_MASK_C));
 		}
-	}*/
-
-	while (1) {
-		for (i = 0; i < 4; i++) {
-			//scan 4 rows
-			numpad_row->gpio_control(GPIO_CMD_SET_BIT_DIR_OUTPUT,(void *) (0x10000 << i));
-			numpad_row->gpio_write(0x00000000, J3_PIN1to4_MASK_C);
-			board_delay_ms(1, 1);
-			numpad_col->gpio_read(&data, J3_PIN7to10_MASK_A);
-
-			for (j = 0; j < 4; j++) {
-				//scan 4 columns
-				if (data & (0x10000 << j)) {
-					if (Numpad_table[i][j].ispress == true) {
-						Numpad_table[i][j].release_time = board_get_cur_us();
-						Numpad_table[i][j].ispress = debounce_start_off;
-					} else if (Numpad_table[i][j].ispress == debounce_start_on) {
-						Numpad_table[i][j].ispress = false;
-					} else if (Numpad_table[i][j].ispress
-							== debounce_start_off) {
-						if (board_get_cur_us()
-								- Numpad_table[i][j].release_time
-								>= 100000ul) {
-							Numpad_table[i][j].ispress = false;
-						}
-					} else {
-						Numpad_table[i][j].ispress = false;
-					}
-				} else {
-					if (Numpad_table[i][j].ispress == false) {
-						Numpad_table[i][j].press_time = board_get_cur_us();
-						Numpad_table[i][j].ispress = debounce_start_on;
-					} else if (Numpad_table[i][j].ispress == debounce_start_on) {
-						if (board_get_cur_us() - Numpad_table[i][j].press_time
-								>= 10000ul) {
-							Numpad_table[i][j].ispress = true;
-							_Npad_Enqueue(id_main, (int) Numpad_Convert[i*4+j]);
-							_Npad_Enqueue(id_oled, (int) Numpad_Convert[i*4+j]);
-						}
-					} else if (Numpad_table[i][j].ispress
-							== debounce_start_off) {
-						Numpad_table[i][j].ispress = true;
-					} else {
-						Numpad_table[i][j].ispress = true;
-					}
-				}
-			}
-			numpad_row->gpio_control(GPIO_CMD_SET_BIT_DIR_INPUT,(void *) (J3_PIN1to4_MASK_C));
-		}
+		vTaskDelay(0);
 	}
 }

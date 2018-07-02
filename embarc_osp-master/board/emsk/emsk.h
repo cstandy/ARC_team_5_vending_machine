@@ -134,12 +134,12 @@
 
 #define WF_IPADDR_DHCP			(1)
 
-#define WF_HOTSPOT_NAME		    "Big big dictionary"
-#define WF_HOTSPOT_PASSWD		"12345678"
+//#define WF_HOTSPOT_NAME		    "Big big dictionary"
+//#define WF_HOTSPOT_PASSWD		"12345678"
 //#define WF_HOTSPOT_NAME		    "KF_0520_wifi"
 //#define WF_HOTSPOT_PASSWD		"kf0520kf"
-//#define WF_HOTSPOT_NAME		    "Andy iPhone"
-//#define WF_HOTSPOT_PASSWD		"smalldeer"
+#define WF_HOTSPOT_NAME		    "Andy iPhone"
+#define WF_HOTSPOT_PASSWD		"smalldeer"
 //#define WF_HOTSPOT_NAME         "need password"
 //#define WF_HOTSPOT_PASSWD       "password"
 

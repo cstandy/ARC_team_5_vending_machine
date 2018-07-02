@@ -50,6 +50,7 @@ static FATFS sd_card_fs;	/* File system object for each logical drive */
 #ifdef OS_FREERTOS
 
 SemaphoreHandle_t spi_mutex; // for more device to connect to spi (pmod 5)
+SemaphoreHandle_t vm_queue_mutex;
 
 /* Note: Task size in unit of StackType_t */
 /* Note: Stack size should be small than 65536, since the stack size unit is uint16_t */
@@ -160,7 +161,7 @@ static TaskHandle_t task_handle_ntshell;
 #else /* No middleware ntshell,will activate main task */
 
 #ifndef TASK_STACK_SIZE_MAIN
-#define TASK_STACK_SIZE_MAIN	MIN_STACKSZ(65535)
+#define TASK_STACK_SIZE_MAIN	MIN_STACKSZ(1024)
 #endif
 
 #ifndef TASK_PRI_MAIN
@@ -225,8 +226,8 @@ static void task_wifi(void *par)
 static void task_main(void *par)
 {
 	int ercd;
-#if defined(OS_FREERTOS) && defined(MID_LWIP) && !defined(MID_NTSHELL) && !defined(MID_VM)
 	EMBARC_PRINTF("Enter to main function....\r\n");
+#if defined(OS_FREERTOS) && defined(MID_LWIP) && !defined(MID_NTSHELL) && !defined(MID_VM)
 	EMBARC_PRINTF("Wait until WiFi connected...\r\n");
 	vTaskSuspend(NULL);
 #endif
@@ -259,6 +260,8 @@ void board_main(void)
 #ifdef MID_VM
     spi_mutex = xSemaphoreCreateBinary();
 	xSemaphoreGive(spi_mutex);
+    vm_queue_mutex = xSemaphoreCreateBinary();
+	xSemaphoreGive(vm_queue_mutex);
 #endif
 #endif
 
@@ -285,7 +288,7 @@ void board_main(void)
 #ifdef OS_FREERTOS
 
     /* create common-use queue for inter-communication */ 
-    xVMQueue = xQueueCreate(12, sizeof(vm_data));
+    xVMQueue = xQueueCreate(48, sizeof(vm_data));
 
     /* create 5 queues for specific usage and device */
 	xMainQueue             = xQueueCreate(12, sizeof(vm_data));
@@ -299,10 +302,10 @@ void board_main(void)
 	xTaskCreate((TaskFunction_t)vm_task,            "vending machine",    TASK_STACK_SIZE_VM,            NULL, TASK_PRI_VM,            &task_handle_vm);
 	xTaskCreate((TaskFunction_t)LED_task,           "led blinky",         TASK_STACK_SIZE_LED,           NULL, TASK_PRI_LED,           &task_handle_led);
 	// xTaskCreate((TaskFunction_t)communication_task, "wifi communication", TASK_STACK_SIZE_COMMUNICATION, NULL, TASK_PRI_COMMUNICATION, &task_handle_communication);
-	xTaskCreate((TaskFunction_t)temp_task,       "temperature",        TASK_STACK_SIZE_TEMP,          NULL, TASK_PRI_TEMP,          &task_handle_temp);
-	xTaskCreate((TaskFunction_t)numpad_task,     "number pad",         TASK_STACK_SIZE_NUMPAD,        NULL, TASK_PRI_NUMPAD,        &task_handle_numpad);
-	// xTaskCreate((TaskFunction_t)dcmotor_task,    "DC motor",           TASK_STACK_SIZE_DCMOTOR,       NULL, TASK_PRI_DCMOTOR,       &task_handle_dcmotor);
-	xTaskCreate((TaskFunction_t)oled_task,       "oled",               TASK_STACK_SIZE_OLED,          NULL, TASK_PRI_OLED,          &task_handle_oled);
+	xTaskCreate((TaskFunction_t)temp_task,          "temperature",        TASK_STACK_SIZE_TEMP,          NULL, TASK_PRI_TEMP,          &task_handle_temp);
+	xTaskCreate((TaskFunction_t)numpad_task,        "number pad",         TASK_STACK_SIZE_NUMPAD,        NULL, TASK_PRI_NUMPAD,        &task_handle_numpad);
+	xTaskCreate((TaskFunction_t)dcmotor_task,       "DC motor",           TASK_STACK_SIZE_DCMOTOR,       NULL, TASK_PRI_DCMOTOR,       &task_handle_dcmotor);
+	xTaskCreate((TaskFunction_t)oled_task,          "oled",               TASK_STACK_SIZE_OLED,          NULL, TASK_PRI_OLED,          &task_handle_oled);
 #endif
 #endif
 
@@ -323,7 +326,7 @@ void board_main(void)
 
 #else /* No ntshell */
 #ifdef OS_FREERTOS
-	xTaskCreate((TaskFunction_t)task_main, "main", TASK_STACK_SIZE_MAIN,
+	xTaskCreate((TaskFunction_t)task_main, "main_function", TASK_STACK_SIZE_MAIN,
 			(void *)(&s_main_args), TASK_PRI_MAIN, &task_handle_main);
 #else /* No os and ntshell */
 	cpu_unlock();	/* unlock cpu to let interrupt work */
