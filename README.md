@@ -161,7 +161,7 @@ Settings is now finished. You can start compiling and run this application.
 
 
 
-* ```..\server_side\```
+* ```\server_side\```
 
 	| FILE                 | description                          |
 	| -------------------- | :---------------------               |
