@@ -103,8 +103,8 @@ void u8g_cover(void) {
 	u8g_DrawStr(&u8g, 0, 25, "NCKUEE");
 	u8g_SetFont(&u8g, u8g_font_6x10);
 	u8g_DrawStr(&u8g, 0, 40, "Vending Machine...");
-	u8g_DrawStr(&u8g, 0, 50, "Please enter your user");
-	u8g_DrawStr(&u8g, 0, 60, "account.");
+	u8g_DrawStr(&u8g, 0, 50, "Please enter your");
+	u8g_DrawStr(&u8g, 0, 60, "user account.");
 }
 
 void u8g_recommand(void) {

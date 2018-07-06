@@ -13,7 +13,7 @@ typedef struct _wifi_data
     int status;
     int target_item;
 
-    char user[4];
+    char user[5];
     char type[4][7];
     char name[4][7];
 

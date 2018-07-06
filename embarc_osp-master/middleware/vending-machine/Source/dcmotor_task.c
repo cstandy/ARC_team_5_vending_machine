@@ -33,7 +33,7 @@ void dcmotor_task(void *p_arg)
             if( xQueueReceive( xDCmotorQueue, &dcmotor_data, portMAX_DELAY ) )
             {
                 motor = dcmotor_data.body[0].i - 48;
-                EMBARC_PRINTF("=========================> motor receive from numpad: %d\r\n", motor);
+                // EMBARC_PRINTF("=========================> motor receive from numpad: %d\r\n", motor);
             }
         }
 
@@ -47,9 +47,9 @@ void dcmotor_task(void *p_arg)
 
         while(1){
             infrared_ray->gpio_read(&motor_spining, 0x0f00);
-            EMBARC_PRINTF("object %d\r\n", motor_spining && 0x0100);
+            // EMBARC_PRINTF("object %d\r\n", motor_spining && 0x0100);
                 if(motor_spining && 0x0100) {
-                    EMBARC_PRINTF("object %d\r\n", motor_spining && 0x0100);
+                    // EMBARC_PRINTF("object %d\r\n", motor_spining && 0x0100);
                     product = OBJECT_DROP; //object drop
                 }  
                 else product = OBJECT_NOT_DROP;// no object drop

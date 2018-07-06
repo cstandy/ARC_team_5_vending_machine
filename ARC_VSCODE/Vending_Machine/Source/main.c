@@ -58,7 +58,8 @@ int main(int argc, char **argv)
 
     vm_data data = {0}; // data for receiveing
 	WIFI_data local_data = {0}; // local database
-	int main_status = main_user_input_1;
+	int main_status = main_init_1;
+	// int main_status = main_user_input_1;
 	char output = 'Z';
 
 	while (1)
@@ -137,7 +138,7 @@ int main(int argc, char **argv)
 		}
 		if (main_status == main_user_input_1)
 		{
-			EMBARC_PRINTF("main reading from numpad started.============================================= \r\n");
+			// EMBARC_PRINTF("Reading from numpad in main function started. \r\n");
 			if( xMainQueue != NULL )	
 			{
 				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )

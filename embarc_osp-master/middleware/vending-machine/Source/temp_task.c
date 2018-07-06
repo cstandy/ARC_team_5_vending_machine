@@ -37,10 +37,10 @@ void temp_task(void *p_arg)
 
 	while(1){
 		cond = adt7420_sensor_read(&ADT7420_DEF_PTR_test, &temp_receive);
-		EMBARC_PRINTF("temperature receive: %d \r\n", (int)temp_receive);
+		// EMBARC_PRINTF("temperature receive: %d \r\n", (int)temp_receive);
 		_Temp_Enqueue(id_wifi, temp_receive);
 		_Temp_Enqueue(id_oled, temp_receive);
-		//board_delay_ms(500, 1);
+		// board_delay_ms(500, 1);
 		vTaskDelay(5000);
 	}
 }
