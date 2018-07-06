@@ -67,14 +67,16 @@ static void exc_handler_default(void *p_excinf)
 	uint32_t excpt_cause_reg = 0;
 	uint32_t excpt_ret_reg = 0;
 	uint32_t exc_no = 0;
+	uint32_t excpt_addr = 0;
 
 	excpt_cause_reg = _arc_aux_read(AUX_ECR);
 	excpt_ret_reg = _arc_aux_read(AUX_ERRET);
 	exc_no = (excpt_cause_reg >> 16) & 0xff;
+	excpt_addr = _arc_aux_read(AUX_EFA);
 
-	dbg_printf(DBG_LESS_INFO, "default cpu exception handler\r\n");
-	dbg_printf(DBG_LESS_INFO, "exc_no:%d, last sp:0x%08x, ecr:0x%08x, eret:0x%08x\r\n",
-		exc_no, (uint32_t)p_excinf, excpt_cause_reg, excpt_ret_reg);
+	dbg_printf(DBG_LESS_INFO, "\r\ndefault cpu exception handler\r\n");
+	dbg_printf(DBG_LESS_INFO, "exc_no:%d, last sp:0x%08x, ecr:0x%08x, eret:0x%08x, efa:0x%08x\r\n",
+		exc_no, (uint32_t)p_excinf, excpt_cause_reg, excpt_ret_reg, excpt_addr);
 #if SECURESHIELD_VERSION == 2
 	while (1);
 #else

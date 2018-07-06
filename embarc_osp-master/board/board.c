@@ -66,7 +66,7 @@ SemaphoreHandle_t vm_queue_mutex;
 
 #ifndef TASK_STACK_SIZE_WIFI
 /* WiFi task stack size */
-#define TASK_STACK_SIZE_WIFI	MIN_STACKSZ(4096)
+#define TASK_STACK_SIZE_WIFI	MIN_STACKSZ(65535)
 #endif
 
 #ifndef TASK_PRI_WIFI
@@ -93,7 +93,7 @@ static TaskHandle_t task_handle_wifi;
 #define TASK_STACK_SIZE_OLED             MIN_STACKSZ(1024)
 #endif
 #ifndef TASK_STACK_SIZE_COMMUNICATION
-#define TASK_STACK_SIZE_COMMUNICATION    MIN_STACKSZ(1024)
+#define TASK_STACK_SIZE_COMMUNICATION    MIN_STACKSZ(65535)
 #endif
 #ifndef TASK_STACK_SIZE_TEMP
 #define TASK_STACK_SIZE_TEMP             MIN_STACKSZ(256)
@@ -205,10 +205,17 @@ static void task_wifi(void *par)
 			EMBARC_PRINTF("WiFi connected \r\n");
 #ifndef MID_NTSHELL /* resume main task when ntshell task is not defined */
 #ifdef MID_VM
-			//if (task_handle_wifi) vTaskResume(task_handle_wifi);
+			
 			//if (communication_task) communication_task (NULL);
-			if (task_handle_communication) communication_task (NULL);
+			//flag = 0;
+
+#ifdef OS_FREERTOS
+			if(task_handle_communication) vTaskResume(task_handle_communication);
+			//vTaskResume(task_handle_wifi);
+#else 
+			if (communication_task) communication_task (NULL);
 			flag = 0;
+#endif
 #else
 			if (task_handle_main) vTaskResume(task_handle_main);
 #endif
@@ -217,6 +224,9 @@ static void task_wifi(void *par)
 			EMBARC_PRINTF("main command may required some arguments, please refer to example's document.\r\n");
 #endif
 			/* consider to generate a event to notify network is ready */
+		} else if ((flag == 1) && !lwip_pmwifi_isup()){// Wifi Lost connection
+			if(task_handle_communication) vTaskSuspend(task_handle_communication);
+			flag = 0;
 		}
 		vTaskDelay(TASK_WIFI_PERIOD);
 	}
@@ -301,7 +311,7 @@ void board_main(void)
     /* create 5 tasks */
 	xTaskCreate((TaskFunction_t)vm_task,            "vending machine",    TASK_STACK_SIZE_VM,            NULL, TASK_PRI_VM,            &task_handle_vm);
 	xTaskCreate((TaskFunction_t)LED_task,           "led blinky",         TASK_STACK_SIZE_LED,           NULL, TASK_PRI_LED,           &task_handle_led);
-	// xTaskCreate((TaskFunction_t)communication_task, "wifi communication", TASK_STACK_SIZE_COMMUNICATION, NULL, TASK_PRI_COMMUNICATION, &task_handle_communication);
+	xTaskCreate((TaskFunction_t)communication_task, "wifi communication", TASK_STACK_SIZE_COMMUNICATION, NULL, TASK_PRI_COMMUNICATION, &task_handle_communication);
 	xTaskCreate((TaskFunction_t)temp_task,          "temperature",        TASK_STACK_SIZE_TEMP,          NULL, TASK_PRI_TEMP,          &task_handle_temp);
 	xTaskCreate((TaskFunction_t)numpad_task,        "number pad",         TASK_STACK_SIZE_NUMPAD,        NULL, TASK_PRI_NUMPAD,        &task_handle_numpad);
 	xTaskCreate((TaskFunction_t)dcmotor_task,       "DC motor",           TASK_STACK_SIZE_DCMOTOR,       NULL, TASK_PRI_DCMOTOR,       &task_handle_dcmotor);

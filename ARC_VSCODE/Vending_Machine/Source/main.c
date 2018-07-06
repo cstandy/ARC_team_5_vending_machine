@@ -1,4 +1,5 @@
 /* embARC HAL */
+
 #include "embARC.h"
 #include "embARC_debug.h"
 
