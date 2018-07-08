@@ -1,4 +1,4 @@
-// #define USE_VENDINGSMACHINE2
+#define USE_VENDINGSMACHINE2
 // alternative server choice: vendingsmachine/vendingsmachine2
 
 #if !defined(MBEDTLS_CONFIG_FILE)
@@ -52,15 +52,14 @@ int main( void )
 #define DFL_REQUEST_PAGE        "/arcproject/project-arc/read.php"
 //#define DFL_REQUEST_PAGE        "/"
 #define POST_REQUEST            "POST %s HTTP/1.1\r\nHost: vendingsmachine.caslab.ee.ncku.edu.tw\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: %d\r\n\r\npost=%s\t%d\t%d\t%s\t%d\t%d\t%d\t%d"
-#define POST_REQUEST_LENGTH     17
 #else
 #define DFL_SERVER_NAME         "vendingsmachine2.caslab.ee.ncku.edu.tw"
 #define DFL_SERVER_ADDR         "vendingsmachine2.caslab.ee.ncku.edu.tw"
 #define DFL_REQUEST_PAGE        "/arc/read.php"
 #define POST_REQUEST            "POST %s HTTP/1.1\r\nHost: vendingsmachine2.caslab.ee.ncku.edu.tw\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: %d\r\n\r\npost=%s\t%d\t%d\t%s\t%d\t%d\t%d\t%d"
-#define POST_REQUEST_LENGTH     17
 #endif /* USE_VENDINGSMAHCINE2 */
 
+#define POST_REQUEST_LENGTH     27
 // #define GET_REQUEST             "GET %s HTTP/1.0\r\nHost: vendingsmachine.caslab.ee.ncku.edu.tw "
 #define GET_REQUEST_END         "\r\n\r\n"
 
@@ -91,7 +90,7 @@ int main( void )
 #define DFL_TRUNC_HMAC          -1
 #define DFL_RECSPLIT            -1
 #define DFL_DHMLEN              -1
-#define DFL_RECONNECT           0
+#define DFL_RECONNECT           1
 #define DFL_RECO_DELAY          0
 #define DFL_RECONNECT_HARD      0
 #define DFL_TICKETS             MBEDTLS_SSL_SESSION_TICKETS_ENABLED
@@ -829,9 +828,6 @@ while(1)
     mbedtls_printf( " ok\n" );
 #endif /* MBEDTLS_X509_CRT_PARSE_C */
 
-
-    while (1)
-    {
         /*
         * 2. Start the connection
         */
@@ -1148,7 +1144,7 @@ while(1)
 #endif /* MBEDTLS_SSL_RENEGOTIATION */
 
         /*
-        * 6. Write the GET request
+        * 6. Write the GET request or POST request
         */
         retry_left = opt.max_resend;
 
@@ -1157,6 +1153,10 @@ while(1)
         int init = 1;
         vm_data data_from_queue = {0};
         WIFI_data wifi_data = {0};
+        wifi_data.user[0] = '1';
+        wifi_data.user[1] = '2';
+        wifi_data.user[2] = '3';
+        wifi_data.user[3] = '4';
 
     send_request:
         mbedtls_printf( "  > Write to server:" );
@@ -1168,8 +1168,8 @@ while(1)
             {
                 if (data_from_queue.source_id == id_temp)
                 {
-                    strncpy(temp, "00.00", 5);
-                    // sprintf(temp, "%*.*lf", 2, 2, wifi_data.body[0].f);
+                    // strncpy(temp, "00.00", 5);
+                    sprintf(temp, "%*.*lf", 2, 2, data_from_queue.body[0].f);
                 }
                 else if (data_from_queue.source_id == id_main)
                 {
@@ -1183,18 +1183,13 @@ while(1)
         if (init == 0)
         {
             len = mbedtls_snprintf( (char *) buf, MBEDTLS_SSL_MAX_CONTENT_LEN, POST_REQUEST, opt.request_page, POST_REQUEST_LENGTH,
-                                NULL, wifi_data.target_item, wifi_data.status, wifi_data.user,
+                                temp, wifi_data.target_item, wifi_data.status, wifi_data.user,
                                 wifi_data.body[0].i, wifi_data.body[1].i, wifi_data.body[2].i, wifi_data.body[3].i);
             tail_len = (int) strlen( GET_REQUEST_END );
         }
         else{
-            EMBARC_PRINTF("\r\n");
-            EMBARC_PRINTF(POST_REQUEST, opt.request_page, POST_REQUEST_LENGTH,
-                                temp, wifi_data.target_item, wifi_data.status, wifi_data.user,
-                                wifi_data.body[0].i, wifi_data.body[1].i, wifi_data.body[2].i, wifi_data.body[3].i);
-            
             len = mbedtls_snprintf( (char *) buf, MBEDTLS_SSL_MAX_CONTENT_LEN, POST_REQUEST, opt.request_page, POST_REQUEST_LENGTH,
-                                temp, wifi_data.target_item, wifi_data.status, wifi_data.user,
+                                "00.00", wifi_data.target_item, wifi_data.status, wifi_data.user,
                                 wifi_data.body[0].i, wifi_data.body[1].i, wifi_data.body[2].i, wifi_data.body[3].i);
             tail_len = (int) strlen( GET_REQUEST_END );
         }
@@ -1305,73 +1300,64 @@ while(1)
                 // ***************************************************************************
                 _Wifi_Enqueue(id_main, (char *) buf);
 
-                wifi_data.target_item = 0;
-                wifi_data.status = 0;
-                strncpy(wifi_data.user,    "0",   4);
-                strncpy(wifi_data.name[0], "Soda  ", 7);
-                strncpy(wifi_data.type[0], "drinks", 7);
-                wifi_data.body[0].i = 0;
-                strncpy(wifi_data.name[1], "water ", 7); 
-                strncpy(wifi_data.type[1], "drinks", 7);
-                wifi_data.body[1].i = 0;
-                strncpy(wifi_data.name[2], "Coffee", 7); 
-                strncpy(wifi_data.type[2], "drinks", 7);
-                wifi_data.body[2].i = 0;
-                strncpy(wifi_data.name[3], "Chips ", 7); 
-                strncpy(wifi_data.type[3], "food  ", 7);
-                wifi_data.body[3].i = 0;
-
-                /*
-                wifi_data.target_item = (int)buf[204] - 48;
-                wifi_data.status = 0;
-                strncpy(wifi_data.user,    "6289",   4);
-                strncpy(wifi_data.name[0], "Soda  ", 7);
-                strncpy(wifi_data.type[0], "drinks", 7);
-                wifi_data.body[0].i = 2;
-                strncpy(wifi_data.name[1], "water ", 7); 
-                strncpy(wifi_data.type[1], "drinks", 7);
-                wifi_data.body[1].i = 5;
-                strncpy(wifi_data.name[2], "Coffee", 7); 
-                strncpy(wifi_data.type[2], "drinks", 7);
-                wifi_data.body[2].i = 4;
-                strncpy(wifi_data.name[3], "Chips ", 7); 
-                strncpy(wifi_data.type[3], "food  ", 7);
-                wifi_data.body[3].i = 6;
-                */
-
-                /*
-                if (init == 1)
+                EMBARC_PRINTF("%c%c%c", buf[9], buf[10], buf[11]);
+                if (buf[9] == '2' && buf[10] == '0' && buf[11] == '0') // if response from server is "200 OK"
                 {
-                    wifi_data.target_item = (int)buf[200] - 48;
-                    wifi_data.status = (int)buf[202] - 48;
-                    strncpy(wifi_data.user, buf + 204, 4);
-                    strncpy(wifi_data.name[0], buf + 212, 7);
-                    strncpy(wifi_data.type[0], buf + 222, 7);
-                    wifi_data.body[0].i = buf[240] - 48;
-                    strncpy(wifi_data.name[1], buf + 245, 7);
-                    strncpy(wifi_data.type[1], buf + 255, 7);
-                    wifi_data.body[1].i = buf[273] - 48);
-                    strncpy(wifi_data.name[2], buf + 278, 7); 
-                    strncpy(wifi_data.type[2], buf + 288, 7);
-                    wifi_data.body[2].i = buf[306] - 48;
-                    strncpy(wifi_data.name[3], buf + 311, 7); 
-                    strncpy(wifi_data.type[3], buf + 321, 7);
-                    wifi_data.body[3].i = buf[339] - 48);
-
-                    init = 0;
+                    if (init == 1)
+                    {
+                        init = 0;
+                        wifi_data.status = 9; // test for balance check
+                        wifi_data.target_item = 1; // test for balance check
+#ifndef USE_VENDINGSMACHINE2
+                        // wifi_data.target_item = (int)buf[200] - 48;
+                        // wifi_data.status = (int)buf[202] - 48;
+                        // strncpy(wifi_data.user, buf + 202, 4);
+                        strncpy(wifi_data.name[0], buf + 209, 6);
+                        strncpy(wifi_data.type[0], buf + 219, 6);
+                        wifi_data.body[0].i = buf[238] - 48;
+                        strncpy(wifi_data.name[1], buf + 242, 6);
+                        strncpy(wifi_data.type[1], buf + 252, 6);
+                        wifi_data.body[1].i = buf[271] - 48;
+                        strncpy(wifi_data.name[2], buf + 275, 6); 
+                        strncpy(wifi_data.type[2], buf + 285, 6);
+                        wifi_data.body[2].i = buf[304] - 48;
+                        strncpy(wifi_data.name[3], buf + 308, 6); 
+                        strncpy(wifi_data.type[3], buf + 318, 6);
+                        wifi_data.body[3].i = buf[337] - 48;
+#else
+                        // wifi_data.target_item = (int)buf[200] - 48;
+                        // wifi_data.status = (int)buf[202] - 48;
+                        // strncpy(wifi_data.user, buf + 204, 4);
+                        strncpy(wifi_data.name[0], buf + 211, 6);
+                        strncpy(wifi_data.type[0], buf + 221, 6);
+                        wifi_data.body[0].i = buf[240] - 48;
+                        strncpy(wifi_data.name[1], buf + 244, 6);
+                        strncpy(wifi_data.type[1], buf + 254, 6);
+                        wifi_data.body[1].i = buf[273] - 48;
+                        strncpy(wifi_data.name[2], buf + 277, 6); 
+                        strncpy(wifi_data.type[2], buf + 287, 6);
+                        wifi_data.body[2].i = buf[306] - 48;
+                        strncpy(wifi_data.name[3], buf + 310, 6); 
+                        strncpy(wifi_data.type[3], buf + 320, 6);
+                        wifi_data.body[3].i = buf[339] - 48;                   
+#endif /* USE_VENDINGSMACHINE2 */
+                    }
+                     --wifi_data.body[wifi_data.target_item - 1].i;
+                    // decrease the number of item if buying
                 }
-                */
-                // ==============
+
                 EMBARC_PRINTF("\r\n\r\n $$$$$$$ check the value reading from wifi connection $$$$$$$ \r\n\r\n");
                 EMBARC_PRINTF("\t target item: %d\r\n", wifi_data.target_item);
                 EMBARC_PRINTF("\t status     : %d\r\n", wifi_data.status);
                 EMBARC_PRINTF("\t user       : %s\r\n", wifi_data.user);
-                EMBARC_PRINTF("\t name 1: %s, type 1: %s\r\n", wifi_data.name[0], wifi_data.type[0]);
-                EMBARC_PRINTF("\t name 2: %s, type 2: %s\r\n", wifi_data.name[1], wifi_data.type[1]);
-                EMBARC_PRINTF("\t name 3: %s, type 3: %s\r\n", wifi_data.name[2], wifi_data.type[2]);
-                EMBARC_PRINTF("\t name 4: %s, type 4: %s\r\n", wifi_data.name[3], wifi_data.type[3]);
+                EMBARC_PRINTF("\t name 1: %s, type 1: %s, #: %d\r\n", wifi_data.name[0], wifi_data.type[0], wifi_data.body[0].i);
+                EMBARC_PRINTF("\t name 2: %s, type 2: %s, #: %d\r\n", wifi_data.name[1], wifi_data.type[1], wifi_data.body[1].i);
+                EMBARC_PRINTF("\t name 3: %s, type 3: %s, #: %d\r\n", wifi_data.name[2], wifi_data.type[2], wifi_data.body[2].i);
+                EMBARC_PRINTF("\t name 4: %s, type 4: %s, #: %d\r\n", wifi_data.name[3], wifi_data.type[3], wifi_data.body[3].i);
                 EMBARC_PRINTF("\r\n $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ \r\n\r\n");
-                // ==============
+
+                // just for pausing putty output
+                // console_getchar();
 
                 /* End of message should be detected according to the syntax of the
                 * application protocol (eg HTTP), just use a dummy test here. */
@@ -1450,18 +1436,22 @@ while(1)
             goto send_request;
         }
 
+        memset(buf, 0, MBEDTLS_SSL_MAX_CONTENT_LEN);
+
 #ifdef OS_FREERTOS
-        vTaskDelay(10000);
+        EMBARC_PRINTF("  . Waiting 3s for next data exchange...\r\n");
+        vTaskDelay(3000);
 #endif
 
-        memset(buf, 0, MBEDTLS_SSL_MAX_CONTENT_LEN);
+        if (init != 1)
+            console_getchar();
+
 
         /*
         * 7c. Continue doing data exchanges?
         */
         if( opt.exchanges > 0 )
             goto send_request;
-    }
 
     /*
     * 8. Done, cleanly close the connection
@@ -1483,7 +1473,7 @@ close_notify:
 reconnect:
     if( opt.reconnect != 0 )
     {
-        --opt.reconnect;
+        // --opt.reconnect;
 
         mbedtls_net_free( &server_fd );
 

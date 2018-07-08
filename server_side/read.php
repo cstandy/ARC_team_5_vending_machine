@@ -6,7 +6,7 @@
 //fetch item data from mysql to the file
 error_reporting(E_ALL & ~E_NOTICE);//取消notice顯示
 //$fp = fsockopen("127.0.0.1", 9527, $errno, $errstr, 5);
-$con = mysqli_connect("127.0.0.1", "account", "password", "projectarc");
+$con = mysqli_connect("127.0.0.1", "peter1719", "Good870216", "projectarc");
 if (!$con) {
     echo "連接錯誤";
     die('Error, insert query failed');
@@ -32,13 +32,14 @@ function test_input($data)//處理資料，防止錯誤
     return $data;
 }
 
-function update($user, $reject,$con)//update the data base
+function update($user, $reject, $con)//update the data base
 {
-    if ($reject == 1) {
+    if($reject == 2)
+    {
         $data = mysqli_query($con, "select * from item");
         $size = mysqli_num_rows($data);//陣列大小
         $myfile = fopen("com2arc.txt", "w") or die("Unable to open file!");
-        $txt = "0\t4\t" ."$user". "\n";
+        $txt = "0\t0\t" . "$user" . "\n";
         fwrite($myfile, $txt);
         for ($i = 1; $i <= $size; $i++) {
             $rs = mysqli_fetch_row($data);
@@ -52,7 +53,28 @@ function update($user, $reject,$con)//update the data base
             fwrite($myfile, $txt);
         }
         $fileData = file_get_contents("com2arc.txt");
-        fclose($myfile);        
+        fclose($myfile);
+        return $fileData;
+    }
+    else if ($reject == 1) {
+        $data = mysqli_query($con, "select * from item");
+        $size = mysqli_num_rows($data);//陣列大小
+        $myfile = fopen("com2arc.txt", "w") or die("Unable to open file!");
+        $txt = "0\t4\t" . "$user" . "\n";
+        fwrite($myfile, $txt);
+        for ($i = 1; $i <= $size; $i++) {
+            $rs = mysqli_fetch_row($data);
+            $order = $rs[0];
+            $name = make_string($rs[1]);
+            $Price = $rs[2];
+            $Type = make_string($rs[3]);
+            $Exp_Date = $rs[4];
+            $num = $rs[5];
+            $txt = "$order" . "\t" . "$name" . "\t" . "$Price" . "\t" . "$Type" . "\t" . " $Exp_Date" . "\t" . "$num" . "\n";
+            fwrite($myfile, $txt);
+        }
+        $fileData = file_get_contents("com2arc.txt");
+        fclose($myfile);
         return $fileData;
     } else {
         $sql = "SELECT * FROM `costomer` WHERE `Rfid` = \"" . $user . "\";";
@@ -71,11 +93,11 @@ function update($user, $reject,$con)//update the data base
             }
         }
         $recommand_item = $recommand_weight[rand(0, $array_size)];
-        
+
         $data = mysqli_query($con, "select * from item");
         $size = mysqli_num_rows($data);//陣列大小
         $myfile = fopen("com2arc.txt", "w") or die("Unable to open file!");
-        $txt = "$recommand_item"."\t3\t" . "$user" . "\n";
+        $txt = "$recommand_item" . "\t3\t" . "$user" . "\n";
         fwrite($myfile, $txt);
         for ($i = 1; $i <= $size; $i++) {
             $rs = mysqli_fetch_row($data);
@@ -85,7 +107,7 @@ function update($user, $reject,$con)//update the data base
             $Type = make_string($rs[3]);
             $Exp_Date = $rs[4];
             $num = $rs[5];
-            $txt = "$order" . "\t" . "$name" . "\t" . "$Price" . "\t" . "$Type" . "\t" . " $Exp_Date" . "\t" . "$num" . "\n";
+            $txt = "$order" . "\t" . "$name" . "\t" . "$Price" . "\t" . "$Type" . "\t" . "$Exp_Date" . "\t" . "$num" . "\n";
             fwrite($myfile, $txt);
         }
         $fileData = file_get_contents("com2arc.txt");
@@ -97,8 +119,8 @@ function update($user, $reject,$con)//update the data base
 /*********************************************************************************/
 //echo "Loading... \n";
 
- if (isset($_POST["post"]))//獲得html form post過來的值
- {
+if (isset($_POST["post"]))//獲得html form post過來的值
+{
     $read = $_POST["post"];
    // $read = "26.25\t1\t1\t1234\t2\t3\t4\t5";
     //echo $read;
@@ -106,7 +128,7 @@ function update($user, $reject,$con)//update the data base
     $myfile = fopen("arc2php.txt", "w") or die("Unable to open file!");
     fwrite($myfile, $txt);
     fclose($myfile);
-    $myfile = fopen("arc2php.txt", "r");    
+    $myfile = fopen("arc2php.txt", "r");
     $value = fgets($myfile);//first line
     $value = rtrim($value);//取消每個字元後的空白
     $value = explode("\t", $value);//用tab分開字串
@@ -164,7 +186,10 @@ function update($user, $reject,$con)//update the data base
         for ($i = 1; $i <= 4; $i++) {
             $data = mysqli_query($con, "UPDATE `item` SET `Num` = '" . $num[$i - 1] . "' WHERE `item`.`序號` = " . $i . ";");
         }
-
+        if($state == 0)
+        {
+            echo update($user, 2, $con);
+        }
         /*****************判斷post的內容**************************** */
         /*temp target_item status user*/
         if ($state == 1)//1.uer exist? 2.判斷餘額是否足夠 
@@ -173,13 +198,13 @@ function update($user, $reject,$con)//update the data base
             $search = mysqli_query($con, $sql);
             $result = mysqli_fetch_array($search);
             if (empty($result)) {//since rfid not found ,return reject at status
-                echo update($user,1, $con);
+                echo update($user, 1, $con);
             } else {//having found rfid, then check balance
                 //get balance from database
                 $sql = "SELECT * FROM `costomer` WHERE `Rfid` = \"" . $user . "\";";
                 $search = mysqli_query($con, $sql);
                 $result = mysqli_fetch_row($search);
-               
+
                 $sql2 = "SELECT * FROM `item` WHERE `序號` = \"" . $target_item . "\";";
                 $search2 = mysqli_query($con, $sql2);
                 $result2 = mysqli_fetch_row($search2);
@@ -188,7 +213,7 @@ function update($user, $reject,$con)//update the data base
                 {
                     echo update($user, 1, $con);
                 } else {//return 3 at status and recomand item
-                    echo update($user, 0, $con);                    
+                    echo update($user, 0, $con);
                 }
             }
         } else if ($state == 9)//update sell data
@@ -201,22 +226,22 @@ function update($user, $reject,$con)//update the data base
             $search = mysqli_query($con, $sql);
             $result = mysqli_fetch_row($search);
             $balance_old = $result[6];
-            $liknum = $result[$target_item+1] + 1;//get the old like counter
-            
+            $liknum = $result[$target_item + 1] + 1;//get the old like counter
+
             $sql = "SELECT * FROM `item` WHERE `序號` = \"" . $target_item . "\";";
             $search = mysqli_query($con, $sql);
             $result = mysqli_fetch_row($search);
             $cost = $result[2];//get item cost
             $item = $result[1];//get name
 
-            $balance_new = $balance_old - $cost;            
-            $sql = "INSERT INTO `record` (`Buy_Time`, `Rfid`, `Item`, `Cost`, `Balance`) VALUES('".$Time."', '".$user."', '".$item."', ".$cost.", '".$balance_new."');";
+            $balance_new = $balance_old - $cost;
+            $sql = "INSERT INTO `record` (`Buy_Time`, `Rfid`, `Item`, `Cost`, `Balance`) VALUES('" . $Time . "', '" . $user . "', '" . $item . "', " . $cost . ", '" . $balance_new . "');";
             $data = mysqli_query($con, $sql);
 
-            $like = "like".(string)$target_item;
-            $sql = "UPDATE `costomer` SET `".$like."` = '".$liknum."', `Balance` = '".$balance_new."' WHERE `costomer`.`Rfid` = ".$user.";";
+            $like = "like" . (string)$target_item;
+            $sql = "UPDATE `costomer` SET `" . $like . "` = '" . $liknum . "', `Balance` = '" . $balance_new . "' WHERE `costomer`.`Rfid` = " . $user . ";";
             $data = mysqli_query($con, $sql);
-            echo update($user, 0, $con);          
+            echo update($user, 0, $con);
         }
        
         

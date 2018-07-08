@@ -53,8 +53,6 @@ void _Wifi_Main_Enqueue (WIFI_data _wifi_data)
 int main(int argc, char **argv)
 {
 	EMBARC_PRINTF("entering main function\r\n");
-	// 實作各 main
-	// 流程都寫在這裡
 
     vm_data data = {0}; // data for receiveing
 	WIFI_data local_data = {0}; // local database
