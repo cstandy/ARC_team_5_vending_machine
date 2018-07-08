@@ -38,10 +38,9 @@ void vm_task(void *p_arg)
                 case id_main:
                     xQueueSend(xMainQueue, &data, portMAX_DELAY);
                     break;
-                /*
                 case id_wifi:
                     xQueueSend(xCommunicationQueue, &data, portMAX_DELAY);
-                    break;*/
+                    break;
                 case id_dcmotor:
                     xQueueSend(xDCmotorQueue, &data, portMAX_DELAY);
                     break;
