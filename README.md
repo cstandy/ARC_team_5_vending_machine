@@ -89,9 +89,9 @@ Firstly, download source code of vending machine from GitHub.
 4. register a new user account from our website. 
  * register link: https://127.0.0.1/../server_side/sign_up.php
 
-4. change the value 'Authority' in the table 'sign_data' to 1.
-5. sign in to enter the main website.
-* register link: https://127.0.0.1/../server_side/sign_in.php
+5. change the value 'Authority' in the table 'sign_data' to 1.
+6. sign in to enter the main website.
+* sign in link: https://127.0.0.1/../server_side/sign_in.php
 
 
 ### Launch VSCode IDE <div id='vscode'/>
