@@ -81,13 +81,14 @@ Firstly, download source code of vending machine from GitHub.
 * Source code download link: https://github.com/cstandy/ARC_team_5_vending_machine.git
 
 ### Run the server_side code <div id='server'/>
-1. open the Apache HTTP server 
-2. import projectarc.sql into phpmysql(Data Base)
-3. register a new user account from our website 
+1. open the Apache HTTP server .
+2. Secure your site with HTTPS(openssl etc...), you should also put the certificae file into the arc board so that it can update data via HTTPS.
+3. import projectarc.sql into phpmysql(Data Base)
+4. register a new user account from our website. 
  * register link: https://127.0.0.1/../server_side/sign_up.php
 
 4. change the value 'Authority' in the table 'sign_data' to 1.
-5. sign in to enter the main website
+5. sign in to enter the main website.
 * register link: https://127.0.0.1/../server_side/sign_in.php
 
 
