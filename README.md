@@ -83,6 +83,8 @@ Firstly, download source code of vending machine from GitHub.
 ### Run the server_side code <div id='server'/>
 1. open the Apache HTTP server .
 2. Secure your site with HTTPS(openssl etc...), you should also put the certificae file into the arc board so that it can update data via HTTPS.
+    - in file `embarc_osp-master/middleware/mbedtls/library/certs.c`
+    - change the content of `const char mbedtls_test_cli_crt_rsa[]`
 3. import projectarc.sql into phpmysql(Data Base)
 4. register a new user account from our website. 
  * register link: https://127.0.0.1/../server_side/sign_up.php
