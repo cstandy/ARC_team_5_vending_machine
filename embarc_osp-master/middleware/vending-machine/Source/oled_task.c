@@ -10,8 +10,8 @@ u8g_t u8g;
 
 // ********************************************************************************
 // variables used for vending machine, indicate the info for all 4 items
-char name[4][7] = {"Airwave", 0};
-char type[4][7] = {0};
+char name[7] = "Chips";
+char type[7] = {0};
 char temp[5] = {"31.75"};
 char user[4] = {"5013"};
 int number[4] = {1, 2, 3, 4};
@@ -86,7 +86,7 @@ void u8g_ascii_2(void) {
 
 uint8_t draw_state = 0;
 
-/** test page in OLED */
+/** test page in OLED 
 void u8g_test(int index) {
 	static char buffer[30];
 	u8g_SetFont(&u8g, u8g_font_gdr30);
@@ -96,6 +96,7 @@ void u8g_test(int index) {
 	xsprintf(buffer, "left: %d, temp: %s", number[index], temp);
 	u8g_DrawStr(&u8g, 0, 60, buffer);
 }
+*/
 
 void u8g_cover(void) {
 	static char buffer[30];
@@ -109,30 +110,30 @@ void u8g_cover(void) {
 
 void u8g_recommand(void) {
 	static char buffer[30];
-	u8g_SetFont(&u8g, u8g_font_gdr30);
-	u8g_DrawStr(&u8g, 0, 35, "Chips");
+	u8g_SetFont(&u8g, u8g_font_gdr20);
+	u8g_DrawStr(&u8g, 0, 25, name);
 	u8g_SetFont(&u8g, u8g_font_6x10);
-	u8g_DrawStr(&u8g, 0, 50, "recommanded ($ 25).");
-	xsprintf(buffer, "left: %d, temp: %s", number[oled_data.target_item], temp);
-	u8g_DrawStr(&u8g, 0, 60, buffer);
+	xsprintf(buffer, "(%s) recommanded.", type);
+	u8g_DrawStr(&u8g, 0, 40, buffer);
+	u8g_DrawStr(&u8g, 0, 50, "Please enter your");
+	u8g_DrawStr(&u8g, 0, 60, "choice of item.");
 }
 
 void u8g_check(void) {
 	static char buffer[30];
 	u8g_SetFont(&u8g, u8g_font_gdr20);
-	u8g_DrawStr(&u8g, 0, 35, name[oled_data.target_item]);
+	u8g_DrawStr(&u8g, 0, 35, name);
 	u8g_SetFont(&u8g, u8g_font_6x10);
-	u8g_DrawStr(&u8g, 0, 50, "purchase ($25)?");
-	xsprintf(buffer, "left: %d, temp: %s", number[oled_data.target_item], temp);
-	u8g_DrawStr(&u8g, 0, 60, buffer);
+	u8g_DrawStr(&u8g, 0, 50, "purchase?");
+	u8g_DrawStr(&u8g, 0, 60, "Press # to confirm.");
 }
 
 void u8g_confirm(void) {
 	static char buffer[30];
 	u8g_SetFont(&u8g, u8g_font_gdr20);
-	u8g_DrawStr(&u8g, 0, 35, name[oled_data.target_item]);
+	u8g_DrawStr(&u8g, 0, 35, "Thanks");
 	u8g_SetFont(&u8g, u8g_font_6x10);
-	u8g_DrawStr(&u8g, 0, 50, "purchased. Thank you.");
+	u8g_DrawStr(&u8g, 0, 50, "Vielen Danke.");
 	xsprintf(buffer, "Terima kasih.");
 	u8g_DrawStr(&u8g, 0, 60, buffer);
 }
@@ -170,16 +171,19 @@ void draw(void) {
 		case input_4:   u8g_input(3);    break;
 		case recommand: u8g_recommand(); break;
 		case check:     u8g_check();     break;
-		case confirm:   u8g_confirm();   break;
+		case confirm:   
+			u8g_confirm();
+			oled_status = normal;
+			vTaskDelay(5000);
+		break;
 	}
-	
 }
 
 void oled_task(void *p_arg)
 {
-	// ********************************************************************************
 	// decode the queue if there is new data receive
 
+	/*
 	if( xOledQueue != 0 )	
 	{
 		if( xQueueReceive( xOledQueue, &oled_data, 0 ) )
@@ -188,6 +192,7 @@ void oled_task(void *p_arg)
 				sprintf(temp, "%*.*lf", 2, 2, oled_data.body[0].f);
 		}
 	}
+	*/
 
 
 	EMBARC_PRINTF("entering oled task\r\n");
@@ -202,7 +207,6 @@ void oled_task(void *p_arg)
 	u8g_Begin(&u8g); /* reset display and put it into default state */
 
 
-	// ********************************************************************************
 	while(1) {
 		// EMBARC_PRINTF("Update frame [%d]\r\n", draw_state);
 		/* picture loop */
@@ -216,7 +220,6 @@ void oled_task(void *p_arg)
 			draw_state = 0;
 		}
 
-		// ********************************************************************************
 		// decode the queue if there is new data receive
 
 		if (oled_status > 7)
@@ -234,12 +237,32 @@ void oled_task(void *p_arg)
 				// else if (oled_data.source_id == id_numpad)
 				else if (oled_data.source_id == id_main)
 				{
-					if (user_receive_status == 4) user_receive_status = 0;
-					user[user_receive_status] = (char)oled_data.body[0].i;
-					++user_receive_status;
+					if (oled_data.target_item == no_item)
+					{
+						if (user_receive_status >= 4) user_receive_status = 0;
 
-					++oled_status;
+						user[user_receive_status] = (char)oled_data.body[0].i;
+						++user_receive_status;
+						++oled_status;
+					} else if (oled_data.status == sell_recommand)
+					// for merchandise recommand
+					{
+						oled_status = recommand;
+						strncpy(name, oled_data.name, 6);
+						strncpy(type, oled_data.type, 6);
+					} else if (oled_data.status == purchase_check)
+					// for user to select the item
+					{
+						oled_status = check;
+						strncpy(name, oled_data.name, 6);
+						strncpy(type, oled_data.type, 6);
+					} else if (oled_data.status == purchase_confirm)
+					// for user to confirm the deal
+					{
+						oled_status = confirm;
+					} 
 				}
+				/*
 				else if (oled_data.source_id == id_wifi)
 				{
 					if (oled_data.status == sell_recommand)
@@ -262,6 +285,7 @@ void oled_task(void *p_arg)
 						}
 					}
 				}
+				*/
 			}
 		}
 		vTaskDelay(100);

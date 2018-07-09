@@ -102,35 +102,17 @@ int main( void )
 #define DFL_EXTENDED_MS         -1
 #define DFL_ETM                 -1
 
-// ********************************************************************************
 #include "embARC.h"
 #include "embARC_debug.h"
 #include "vm_task.h"
 #include "communication_task.h"
 
-static inline void _Wifi_Enqueue(int target_id, char *str) {
+void _Wifi_Enqueue(int target_id, WIFI_data _data) {
     static int init = 1;
-    WIFI_data _data = {0};
     vm_data eq_data = {0};
 
 	_data.source_id = id_wifi;
 	_data.target_id = target_id;
-
-    _data.target_item = (int) str[0] - 48;
-    _data.status = (int) str[2] - 48;
-    strncpy(_data.user, str + 5, 4);
-    strncpy(_data.name[0], str + 13, 7);
-    strncpy(_data.type[0], str + 24, 7);
-    _data.body[0].i = (str[44] - 48) * 10 + (str[45] - 48);
-    strncpy(_data.name[1], str + 50, 7); 
-    strncpy(_data.type[1], str + 61, 7);
-    _data.body[1].i = (str[81] - 48) * 10 + (str[82] - 48);
-    strncpy(_data.name[2], str + 87, 7); 
-    strncpy(_data.type[2], str + 98, 7);
-    _data.body[2].i = (str[118] - 48) * 10 + (str[119] - 48);
-    strncpy(_data.name[3], str + 124, 7); 
-    strncpy(_data.type[3], str + 135, 7);
-    _data.body[3].i = (str[155] - 48) * 10 + (str[156] - 48);
 
     if (init == 1)
     {
@@ -138,29 +120,36 @@ static inline void _Wifi_Enqueue(int target_id, char *str) {
         eq_data.target_id = _data.target_id;
         strncpy(eq_data.name, _data.name[0], 6);
         strncpy(eq_data.type, _data.type[0], 6);
-        eq_data.body[0]   = _data.body[0];
+        eq_data.body[0].i = _data.body[0].i;
+        eq_data.target_item = 1;
         enQueue(eq_data);
         strncpy(eq_data.name, _data.name[1], 6);
         strncpy(eq_data.type, _data.type[1], 6);
-        eq_data.body[1]   = _data.body[1];
+        eq_data.body[1].i = _data.body[1].i;
+        eq_data.target_item = 2;
         enQueue(eq_data);
         strncpy(eq_data.name, _data.name[2], 6);
         strncpy(eq_data.type, _data.type[2], 6);
-        eq_data.body[2]   = _data.body[2];
+        eq_data.body[2].i = _data.body[2].i;
+        eq_data.target_item = 3;
         enQueue(eq_data);
         strncpy(eq_data.name, _data.name[3], 6);
         strncpy(eq_data.type, _data.type[3], 6);
-        eq_data.body[3]   = _data.body[3];
+        eq_data.body[3].i = _data.body[3].i;
+        eq_data.target_item = 4;
         enQueue(eq_data);
+
         init = 0;
     }
 	else
     {
-        eq_data.source_id = id_wifi;
-        eq_data.target_id = _data.target_id;
-        strncpy(eq_data.name, _data.name[_data.target_item], 6);
-        strncpy(eq_data.type, _data.type[_data.target_item], 6);
-        eq_data.body[_data.target_item] = _data.body[_data.target_item];
+        eq_data.source_id   = id_wifi;
+        eq_data.target_id   = _data.target_id;
+        eq_data.target_item = _data.target_item;
+        eq_data.status      = _data.status;
+        strncpy(eq_data.name, _data.name[_data.target_item - 1], 6);
+        strncpy(eq_data.type, _data.type[_data.target_item - 1], 6);
+        eq_data.body[_data.target_item - 1].i = _data.body[_data.target_item - 1].i;
         enQueue(eq_data);
     }
 }
@@ -455,7 +444,7 @@ static int my_verify( void *data, mbedtls_x509_crt *crt, int depth, uint32_t *fl
 }
 #endif /* MBEDTLS_X509_CRT_PARSE_C */
 
-// *****************************************************************************************
+
 // for first time run, wait for wifi to up
 int first = 1;
 
@@ -467,6 +456,18 @@ while(1)
     EMBARC_PRINTF("entering wifi task\r\n");
     int argc = 1;
     char *argv[] = {"main"};
+
+    // vending machine variables
+    char temp[6] = {'0','0','.','0','0'};
+    int init = 1;
+    vm_data data_from_queue = {0};
+    WIFI_data wifi_data = {0};
+    wifi_data.user[0] = '0';
+    wifi_data.user[1] = '0';
+    wifi_data.user[2] = '0';
+    wifi_data.user[3] = '0';
+    wifi_data.user[4] = '\0';
+
 
     int ret = 0, len, tail_len, i, written, frags, retry_left;
     mbedtls_net_context server_fd;
@@ -1148,36 +1149,41 @@ while(1)
         */
         retry_left = opt.max_resend;
 
-        // vending machine variables
-        char temp[6] = {'0','0','.','0','0'};
-        int init = 1;
-        vm_data data_from_queue = {0};
-        WIFI_data wifi_data = {0};
-        wifi_data.user[0] = '1';
-        wifi_data.user[1] = '2';
-        wifi_data.user[2] = '3';
-        wifi_data.user[3] = '4';
-
     send_request:
         mbedtls_printf( "  > Write to server:" );
         fflush( stdout );
 
-    // =========================================================================
-        if (xCommunicationQueue != 0)
-            if( xQueueReceive( xCommunicationQueue, &data_from_queue, 0 ) )
+
+        if (xTempQueue != 0)
+            if( xQueueReceive( xTempQueue, &data_from_queue, 0 ) )
             {
                 if (data_from_queue.source_id == id_temp)
                 {
+                    EMBARC_PRINTF("\r\n ## receive data from temp...\r\n");
                     // strncpy(temp, "00.00", 5);
                     sprintf(temp, "%*.*lf", 2, 2, data_from_queue.body[0].f);
                 }
-                else if (data_from_queue.source_id == id_main)
+            }
+        if (xCommunicationQueue != 0)
+            if( xQueueReceive( xCommunicationQueue, &data_from_queue, 0 ) )
+            {
+                if (data_from_queue.source_id == id_main)
                 {
-                    strncpy(wifi_data.type[data_from_queue.target_item], data_from_queue.type, 6);
-                    strncpy(wifi_data.name[data_from_queue.target_item], data_from_queue.name, 6);
-                    strncpy(wifi_data.user, data_from_queue.user, 4); 
-                }
+                    EMBARC_PRINTF("\r\n ## receive data from main...\r\n");
+                    /*
+                    if (data_from_queue.target_item != no_item)
+                    {
+                        strncpy(wifi_data.type[data_from_queue.target_item - 1], data_from_queue.type, 6);
+                        strncpy(wifi_data.name[data_from_queue.target_item - 1], data_from_queue.name, 6);
+                    }
+                    */
+                    wifi_data.status      = data_from_queue.status;
+                    wifi_data.target_item = data_from_queue.target_item;
+                    strncpy(wifi_data.user, data_from_queue.user, 4);
 
+                    for ( int i = 0; i < 4; i++ )
+                        wifi_data.body[i].i = data_from_queue.body[i].i;
+                }
             }
 
         if (init == 0)
@@ -1297,21 +1303,21 @@ while(1)
                 buf[len] = '\0';
                 mbedtls_printf( " %d bytes read\n\n%s", len, (char *) buf );
 
-                // ***************************************************************************
-                _Wifi_Enqueue(id_main, (char *) buf);
-
-                EMBARC_PRINTF("%c%c%c", buf[9], buf[10], buf[11]);
+                /*
+                 * decode the information receive from the server
+                 */
+                // EMBARC_PRINTF("%c%c%c", buf[9], buf[10], buf[11]);
                 if (buf[9] == '2' && buf[10] == '0' && buf[11] == '0') // if response from server is "200 OK"
                 {
                     if (init == 1)
                     {
                         init = 0;
-                        wifi_data.status = 9; // test for balance check
-                        wifi_data.target_item = 1; // test for balance check
+                        // wifi_data.status = 1; // test for balance check
+                        // wifi_data.target_item = 1; // test for balance check
 #ifndef USE_VENDINGSMACHINE2
-                        // wifi_data.target_item = (int)buf[200] - 48;
-                        // wifi_data.status = (int)buf[202] - 48;
-                        // strncpy(wifi_data.user, buf + 202, 4);
+                        wifi_data.target_item = (int)buf[198] - 48;
+                        wifi_data.status = (int)buf[200] - 48;
+                        strncpy(wifi_data.user, buf + 202, 4);
                         strncpy(wifi_data.name[0], buf + 209, 6);
                         strncpy(wifi_data.type[0], buf + 219, 6);
                         wifi_data.body[0].i = buf[238] - 48;
@@ -1339,14 +1345,27 @@ while(1)
                         wifi_data.body[2].i = buf[306] - 48;
                         strncpy(wifi_data.name[3], buf + 310, 6); 
                         strncpy(wifi_data.type[3], buf + 320, 6);
-                        wifi_data.body[3].i = buf[339] - 48;                   
+                        wifi_data.body[3].i = buf[339] - 48;                
 #endif /* USE_VENDINGSMACHINE2 */
                     }
-                     --wifi_data.body[wifi_data.target_item - 1].i;
+                    else{
+#ifndef USE_VENDINGSMACHINE2
+                        wifi_data.target_item = (int)buf[198] - 48;
+                        wifi_data.status = (int)buf[200] - 48;
+                        // strncpy(wifi_data.user, buf + 202, 4);
+#else
+                        wifi_data.target_item = (int)buf[200] - 48;
+                        wifi_data.status = (int)buf[202] - 48;
+                        // strncpy(wifi_data.user, buf + 204, 4);
+#endif
+                    }
+                    //--wifi_data.body[wifi_data.target_item - 1].i;
                     // decrease the number of item if buying
                 }
 
-                EMBARC_PRINTF("\r\n\r\n $$$$$$$ check the value reading from wifi connection $$$$$$$ \r\n\r\n");
+                _Wifi_Enqueue(id_main, wifi_data);
+                
+                EMBARC_PRINTF("\r\n\r\n$$$$$$$ check the value reading from wifi connection $$$$$$$\r\n\r\n");
                 EMBARC_PRINTF("\t target item: %d\r\n", wifi_data.target_item);
                 EMBARC_PRINTF("\t status     : %d\r\n", wifi_data.status);
                 EMBARC_PRINTF("\t user       : %s\r\n", wifi_data.user);
@@ -1354,7 +1373,8 @@ while(1)
                 EMBARC_PRINTF("\t name 2: %s, type 2: %s, #: %d\r\n", wifi_data.name[1], wifi_data.type[1], wifi_data.body[1].i);
                 EMBARC_PRINTF("\t name 3: %s, type 3: %s, #: %d\r\n", wifi_data.name[2], wifi_data.type[2], wifi_data.body[2].i);
                 EMBARC_PRINTF("\t name 4: %s, type 4: %s, #: %d\r\n", wifi_data.name[3], wifi_data.type[3], wifi_data.body[3].i);
-                EMBARC_PRINTF("\r\n $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ \r\n\r\n");
+                EMBARC_PRINTF("\r\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\r\n\r\n");
+                vTaskSuspend(NULL);
 
                 // just for pausing putty output
                 // console_getchar();
@@ -1437,21 +1457,18 @@ while(1)
         }
 
         memset(buf, 0, MBEDTLS_SSL_MAX_CONTENT_LEN);
-
+/*
 #ifdef OS_FREERTOS
-        EMBARC_PRINTF("  . Waiting 3s for next data exchange...\r\n");
-        vTaskDelay(3000);
+        EMBARC_PRINTF("  . Waiting 1s for next data exchange...\r\n");
+        vTaskDelay(1000);
 #endif
+*/
 
-        if (init != 1)
-            console_getchar();
-
-
-        /*
-        * 7c. Continue doing data exchanges?
-        */
-        if( opt.exchanges > 0 )
-            goto send_request;
+    /*
+    * 7c. Continue doing data exchanges?
+    */
+    if( opt.exchanges > 0 )
+        goto send_request;
 
     /*
     * 8. Done, cleanly close the connection
@@ -1571,6 +1588,10 @@ exit:
     EMBARC_PRINTF("\r\n.........................................\r\n");
     EMBARC_PRINTF("\r\nProgram failed, restart the wifi connection.\r\n");
     EMBARC_PRINTF("\r\n.........................................\r\n\r\n");
+#ifdef OS_FREERTOS
+    EMBARC_PRINTF("  . Waiting 3s for next data exchange...\r\n");
+    vTaskDelay(3000);
+#endif
 }
 }
 #endif /* MBEDTLS_BIGNUM_C && MBEDTLS_ENTROPY_C && MBEDTLS_SSL_TLS_C &&

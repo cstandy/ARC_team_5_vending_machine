@@ -1,14 +1,6 @@
 #ifndef VM_TASK_H
 #define VM_TASK_H
 
-
-// **********************************************************
-// 重新思考一下怎麼寫：
-// 讓程式互相以一種封包傳資料
-// id 用作不同 device 的辨別
-// 在 dispacher (vm_task) 中把東西丟下去
-
-
 // define id
 #define id_main      1
 #define id_wifi      2

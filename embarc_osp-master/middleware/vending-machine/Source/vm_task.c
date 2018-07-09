@@ -5,6 +5,7 @@
 #include "vm_task.h"
 
 extern SemaphoreHandle_t vm_queue_mutex;
+extern TaskHandle_t task_handle_communication;
 
 void enQueue(vm_data data)
 {
@@ -40,6 +41,11 @@ void vm_task(void *p_arg)
                     break;
                 case id_wifi:
                     xQueueSend(xCommunicationQueue, &data, portMAX_DELAY);
+                    if (data.source_id == id_main) vTaskResume(task_handle_communication);
+                    break;
+                case id_temp:
+                    xQueueSend(xTempQueue, &data, portMAX_DELAY);
+                    // for wifi accessing to temperature
                     break;
                 case id_dcmotor:
                     xQueueSend(xDCmotorQueue, &data, portMAX_DELAY);

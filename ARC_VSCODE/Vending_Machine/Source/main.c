@@ -31,6 +31,8 @@ void _Main_Enqueue (int target_id, vm_data _data)
     enQueue(_data);
 }
 
+
+// 有問題，待改 沒有這個型態的 queue
 void _Wifi_Main_Enqueue (WIFI_data _wifi_data)
 {
 	vm_data _data;
@@ -40,7 +42,7 @@ void _Wifi_Main_Enqueue (WIFI_data _wifi_data)
 	_data.target_item = _wifi_data.target_item;
 
 	for ( int i = 0; i < 4; i++ )
-			_data.body[i].i = _wifi_data.body[i].i;
+		_data.body[i].i = _wifi_data.body[i].i;
 
 	for ( int i = 0; i < 4; i++ )
 	{
@@ -56,8 +58,8 @@ int main(int argc, char **argv)
 
     vm_data data = {0}; // data for receiveing
 	WIFI_data local_data = {0}; // local database
+	// int main_status = main_init_1;
 	int main_status = main_init_1;
-	// int main_status = main_user_input_1;
 	char output = 'Z';
 
 	while (1)
@@ -68,12 +70,12 @@ int main(int argc, char **argv)
 			{
 				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )
 				{
-					EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
+					// EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
 					if (data.source_id == id_wifi)
 					{
-						strncpy(local_data.type[data.target_item], data.type, 6);
-						strncpy(local_data.name[data.target_item], data.name, 6);
-						local_data.body[data.target_item].i = data.body[data.target_item].i;
+						strncpy(local_data.type[data.target_item - 1], data.type, 6);
+						strncpy(local_data.name[data.target_item - 1], data.name, 6);
+						local_data.body[data.target_item - 1].i = data.body[data.target_item - 1].i;
 						local_data.source_id = id_main;
 						main_status = main_init_2;
 					}
@@ -86,12 +88,12 @@ int main(int argc, char **argv)
 			{
 				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )
 				{
-					EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
+					// EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
 					if (data.source_id == id_wifi)
 					{
-						strncpy(local_data.type[data.target_item], data.type, 6);
-						strncpy(local_data.name[data.target_item], data.name, 6);
-						local_data.body[data.target_item].i = data.body[data.target_item].i;
+						strncpy(local_data.type[data.target_item - 1], data.type, 6);
+						strncpy(local_data.name[data.target_item - 1], data.name, 6);
+						local_data.body[data.target_item - 1].i = data.body[data.target_item - 1].i;
 						local_data.source_id = id_main;
 						main_status = main_init_3;
 					}
@@ -104,12 +106,12 @@ int main(int argc, char **argv)
 			{
 				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )
 				{
-					EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
+					// EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
 					if (data.source_id == id_wifi)
 					{
-						strncpy(local_data.type[data.target_item], data.type, 6);
-						strncpy(local_data.name[data.target_item], data.name, 6);
-						local_data.body[data.target_item].i = data.body[data.target_item].i;
+						strncpy(local_data.type[data.target_item - 1], data.type, 6);
+						strncpy(local_data.name[data.target_item - 1], data.name, 6);
+						local_data.body[data.target_item - 1].i = data.body[data.target_item - 1].i;
 						local_data.source_id = id_main;
 						main_status = main_init_4;
 					}
@@ -122,15 +124,26 @@ int main(int argc, char **argv)
 			{
 				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )
 				{
-					EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
+					// EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
 					if (data.source_id == id_wifi)
 					{
-						strncpy(local_data.type[data.target_item], data.type, 6);
-						strncpy(local_data.name[data.target_item], data.name, 6);
-						local_data.body[data.target_item].i = data.body[data.target_item].i;
+						strncpy(local_data.type[data.target_item - 1], data.type, 6);
+						strncpy(local_data.name[data.target_item - 1], data.name, 6);
+						local_data.body[data.target_item - 1].i = data.body[data.target_item - 1].i;
 						local_data.source_id = id_main;
 						main_status = main_user_input_1;
+
+						EMBARC_PRINTF("\r\n\r\n####### initial value stored in main function #######\r\n\r\n");
+						EMBARC_PRINTF("\t target item: %d\r\n", local_data.target_item);
+						EMBARC_PRINTF("\t status     : %d\r\n", local_data.status);
+						EMBARC_PRINTF("\t user       : %s\r\n", local_data.user);
+						EMBARC_PRINTF("\t name 1: %s, type 1: %s, #: %d\r\n", local_data.name[0], local_data.type[0], local_data.body[0].i);
+						EMBARC_PRINTF("\t name 2: %s, type 2: %s, #: %d\r\n", local_data.name[1], local_data.type[1], local_data.body[1].i);
+						EMBARC_PRINTF("\t name 3: %s, type 3: %s, #: %d\r\n", local_data.name[2], local_data.type[2], local_data.body[2].i);
+						EMBARC_PRINTF("\t name 4: %s, type 4: %s, #: %d\r\n", local_data.name[3], local_data.type[3], local_data.body[3].i);
+						EMBARC_PRINTF("\r\n#####################################################\r\n\r\n");
 					}
+					EMBARC_PRINTF("  -> main initial success\r\n");
 				}
 			}
 		}
@@ -141,10 +154,9 @@ int main(int argc, char **argv)
 			{
 				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )
 				{
-					EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
+					// EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
 					if (data.source_id == id_numpad)
 					{
-						EMBARC_PRINTF("receive char: %c\n", (char) data.body[0].i);
 						data.user[0] = (char) data.body[0].i;
 						data.status  = user_input_1;
 						data.target_id = no_item;
@@ -161,10 +173,9 @@ int main(int argc, char **argv)
 			{
 				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )
 				{
-					EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
+					// EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
 					if (data.source_id == id_numpad)
 					{
-						EMBARC_PRINTF("receive char: %c\n", (char) data.body[0].i);
 						data.user[1] = (char) data.body[0].i;
 						data.status  = user_input_2;
 						data.target_id = no_item;
@@ -181,10 +192,9 @@ int main(int argc, char **argv)
 			{
 				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )
 				{
-					EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
+					// EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
 					if (data.source_id == id_numpad)
 					{
-						EMBARC_PRINTF("receive char: %c\n", (char) data.body[0].i);
 						data.user[2] = (char) data.body[0].i;
 						data.status  = user_input_3;
 						data.target_id = no_item;
@@ -201,40 +211,87 @@ int main(int argc, char **argv)
 			{
 				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )
 				{
-					EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
+					// EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
 					if (data.source_id == id_numpad)
 					{
 						EMBARC_PRINTF("receive char: %c\n", (char) data.body[0].i);
-						data.user[3] = (char) data.body[0].i;
-						data.status  = user_input_4;
+						data.user[3]   = (char) data.body[0].i;
+						data.status    = user_input_4;
 						data.target_id = no_item;
-						data.status    = balance_check;
 						_Main_Enqueue(id_oled, data);
+
+
+						data.status    = balance_check;
 						local_data.user[3] = (char) data.body[0].i;
-						
+
+						for (int i = 0; i < 4; i++)
+							data.user[i] = local_data.user[i];
+						for (int i = 0; i < 4; i++)
+							data.body[i].i = local_data.body[i].i;
+						_Main_Enqueue(id_wifi, data);
+
 						local_data.target_item = no_item;
-						local_data.status      = balance_check;
-						_Wifi_Main_Enqueue(local_data);
+						// local_data.status      = balance_check;
+						// _Wifi_Main_Enqueue(local_data);
 
 						// check balance just once
 						local_data.status = server_do_nothing;
-						_Wifi_Main_Enqueue(local_data);
+						// _Wifi_Main_Enqueue(local_data);
 
-						EMBARC_PRINTF("user input: %s", data.user);
-						main_status = main_user_input_1;
-						// main_status = main_balance_check;
+						EMBARC_PRINTF("\r\n\r\n  -> user id recognize as: %s\r\n\r\n", data.user);
+
+						EMBARC_PRINTF("\r\n\r\n####### value after user inputted #######\r\n\r\n");
+						EMBARC_PRINTF("\t target item: %d\r\n", local_data.target_item);
+						EMBARC_PRINTF("\t status     : %d\r\n", local_data.status);
+						EMBARC_PRINTF("\t user       : %s\r\n", local_data.user);
+						EMBARC_PRINTF("\t name 1: %s, type 1: %s, #: %d\r\n", local_data.name[0], local_data.type[0], local_data.body[0].i);
+						EMBARC_PRINTF("\t name 2: %s, type 2: %s, #: %d\r\n", local_data.name[1], local_data.type[1], local_data.body[1].i);
+						EMBARC_PRINTF("\t name 3: %s, type 3: %s, #: %d\r\n", local_data.name[2], local_data.type[2], local_data.body[2].i);
+						EMBARC_PRINTF("\t name 4: %s, type 4: %s, #: %d\r\n", local_data.name[3], local_data.type[3], local_data.body[3].i);
+						EMBARC_PRINTF("\r\n#####################################################\r\n\r\n");
+
+						main_status = main_balance_check;
 					}
+					EMBARC_PRINTF("  -> main user input 4 success\r\n");
 				}
 			}
 		}
 		if (main_status == main_balance_check)
 		{
 
-			_Wifi_Main_Enqueue(local_data);
-			main_status = main_recommand;
+			if( xMainQueue != NULL )	
+			{
+				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )
+				{
+					EMBARC_PRINTF("  -> main balance check wwith Wi-Fi\r\n");
+					// EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
+					if (data.source_id == id_wifi)
+					{
+						EMBARC_PRINTF("  -> server balance check is %s.\r\n", (data.status == sell_recommand) ? "PASSED" : (data.status = reject_balance) ? "REJECTED" : "UNDEFINED");
+						EMBARC_PRINTF("     => target_item is %d\r\n", data.target_item);
+						EMBARC_PRINTF("     => balance check is %d\r\n", data.status);
+
+						if (data.status == sell_recommand)
+						{
+							main_status = main_purchase_choice;
+							_Main_Enqueue(id_oled, data);
+						}
+						else if (data.status == reject_balance)
+						{
+							data.target_item = 5; // judgement in oled_task()
+							data.status = purchase_confirm;
+							main_status = main_user_input_1;
+							_Main_Enqueue(id_oled, data);
+						}
+					}
+				}
+			}
 		}
+		/*
 		if (main_status == main_recommand)
 		{
+			EMBARC_PRINTF("\r\n  -> enter recommand state.\r\n");
+
 			if( xMainQueue != NULL )	
 			{
 				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )
@@ -249,19 +306,29 @@ int main(int argc, char **argv)
 				}
 			}
 		}
+		*/
 		if (main_status == main_purchase_choice)
 		{
+			EMBARC_PRINTF("  -> enter choice state.\r\n");
+
 			if( xMainQueue != NULL )	
 			{
 				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )
 				{
 					EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
+					EMBARC_PRINTF("  -> numpad input: %c\r\n", (char)data.body[0].i);
 					if (data.source_id == id_numpad)
 					{
-						data.status = purchase_check;
-						local_data.target_item = data.body[0].i;
-						_Main_Enqueue(id_oled, data);
-						main_status = main_purchase_confirm;
+						if (data.body[0].i == '1' || data.body[0].i == '2')
+						{
+							data.status            = purchase_check;
+							data.target_item       = (int)data.body[0].i - 48;
+							local_data.target_item = (int)data.body[0].i - 48;
+							strncpy(data.name, local_data.name[data.target_item - 1], 6);
+							strncpy(data.type, local_data.type[data.target_item - 1], 6);
+							_Main_Enqueue(id_oled, data);
+							main_status = main_purchase_confirm;
+						}	
 					}
 				}
 			}
@@ -272,25 +339,34 @@ int main(int argc, char **argv)
 			{
 				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )
 				{
-					EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
+					EMBARC_PRINTF("  -> main purchase_confirm\r\n");
+					// EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
 					if (data.source_id == id_numpad)
 					{
-						if ((char) data.body[0].i == '*')
+						if ((char) data.body[0].i == '#')
 						{
 							data.target_item = local_data.target_item;
 
 							for ( int i = 0; i < 4; i++ )
 								data.body[i].i = 0;
 							
-							data.body[local_data.target_item].i = 1;
-							local_data.status = purchase_confirm;
-							local_data.body[local_data.target_item].i--;
-							_Main_Enqueue(id_dcmotor, data);
-							_Wifi_Main_Enqueue(local_data);
+							data.body[0].i = local_data.target_item;
 
-							// to avoid purchase record sent by wifi from being more than once
-							local_data.status = server_do_nothing;
-							_Wifi_Main_Enqueue(local_data);
+							data.status       = purchase_confirm;
+							local_data.status = purchase_confirm;
+							local_data.body[local_data.target_item - 1].i--;
+							
+							_Main_Enqueue(id_dcmotor, data);
+
+							for ( int i = 0; i < 4; i++ )
+								data.body[i].i = local_data.body[i].i;
+							
+							strncpy(data.user, local_data.user, 4);
+
+							_Main_Enqueue(id_oled, data);
+							_Main_Enqueue(id_wifi, data);
+
+							// _Wifi_Main_Enqueue(local_data);
 						}
 
 						local_data.user[0] = 0;

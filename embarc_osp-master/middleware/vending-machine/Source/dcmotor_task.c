@@ -32,7 +32,7 @@ void dcmotor_task(void *p_arg)
         {
             if( xQueueReceive( xDCmotorQueue, &dcmotor_data, portMAX_DELAY ) )
             {
-                motor = dcmotor_data.body[0].i - 48;
+                motor = dcmotor_data.body[0].i;
                 // EMBARC_PRINTF("=========================> motor receive from numpad: %d\r\n", motor);
             }
         }
@@ -40,21 +40,20 @@ void dcmotor_task(void *p_arg)
         
             if(motor == 1)      dc_motor->gpio_write(0x0100, 0x0f00);
             else if(motor == 2) dc_motor->gpio_write(0x0200, 0x0f00);
-            else if(motor == 3) dc_motor->gpio_write(0x0400, 0x0f00);
-            else if(motor == 4) dc_motor->gpio_write(0x0800, 0x0f00);
+            //else if(motor == 3) dc_motor->gpio_write(0x0400, 0x0f00);
+            //else if(motor == 4) dc_motor->gpio_write(0x0800, 0x0f00);
             else                dc_motor->gpio_write(0x0000, 0x0f00);
 
 
         while(1){
+            vTaskDelay(1);
             infrared_ray->gpio_read(&motor_spining, 0x0f00);
             // EMBARC_PRINTF("object %d\r\n", motor_spining && 0x0100);
-                if(motor_spining && 0x0100) {
-                    // EMBARC_PRINTF("object %d\r\n", motor_spining && 0x0100);
-                    product = OBJECT_DROP; //object drop
-                }  
-                else product = OBJECT_NOT_DROP;// no object drop
+                if(motor_spining && 0x0100) product = OBJECT_NOT_DROP; // no object drop
+                else                        product = OBJECT_DROP;// object drop
             if (product == OBJECT_DROP) { 
                 dc_motor->gpio_write(0x0000, 0x0f00);
+                motor = 5;
                 break;
             } 
         }

@@ -131,7 +131,7 @@ static TaskHandle_t task_handle_wifi;
 static TaskHandle_t task_handle_vm;
 static TaskHandle_t task_handle_led;
 static TaskHandle_t task_handle_oled;
-static TaskHandle_t task_handle_communication;
+TaskHandle_t task_handle_communication;
 static TaskHandle_t task_handle_temp;
 static TaskHandle_t task_handle_numpad;
 static TaskHandle_t task_handle_dcmotor;

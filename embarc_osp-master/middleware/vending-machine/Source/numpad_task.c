@@ -78,10 +78,10 @@ void numpad_task(void *p_arg)
 						Numpad_table[i][j].release_time = board_get_cur_us();
 						//EMBARC_PRINTF("%d,%d\r\n",i,j);
 						if((Numpad_table[i][j].release_time - Numpad_table[i][j].press_time) >= 100000ul) {
-							EMBARC_PRINTF("%c\n", Numpad_Convert[i*4+j]);
+							// EMBARC_PRINTF("%c\n", Numpad_Convert[i*4+j]);
 							_Npad_Enqueue(id_main,    (int) Numpad_Convert[i*4+j]);
 							// _Npad_Enqueue(id_oled,    (int) Numpad_Convert[i*4+j]);
-							_Npad_Enqueue(id_dcmotor, (int) Numpad_Convert[i*4+j]);
+							// _Npad_Enqueue(id_dcmotor, (int) Numpad_Convert[i*4+j] - 48);
 						}
 						Numpad_table[i][j].ispress = false;
 					} 
