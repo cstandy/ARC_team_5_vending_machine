@@ -59,8 +59,7 @@ sofware requirement
 * Apache server , phpmysql
 
 ### visual Studio IDE settings <div id='ide'/>
-edit ../ARC_VSCODE/StartVSCode.bat to set your ARC toolchain path,
-library path, vscode program path.
+edit `/ARC_VSCODE/StartVSCode.bat` to set your ARC toolchain path, library path, vscode program path.
 example:
 ```
 	SET ARC_ToolChain=C:/arc_gnu
