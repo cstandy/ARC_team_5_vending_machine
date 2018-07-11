@@ -1,3 +1,6 @@
+#define USE_VENDINGSMACHINE2
+// alternative server choice: vendingsmachine/vendingsmachine2
+
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls/config.h"
 #else

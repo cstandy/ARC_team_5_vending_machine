@@ -3,9 +3,6 @@
 
 #include "stdint.h"
 
-#define USE_VENDINGSMACHINE2
-// alternative server choice: vendingsmachine/vendingsmachine2
-
 void communication_task(void *p_arg);
 
 typedef struct _wifi_data
