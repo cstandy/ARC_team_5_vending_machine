@@ -1,0 +1,690 @@
+From 77dd67234edd55942f9ddb4eef2deba0b4b84569 Mon Sep 17 00:00:00 2001
+From: XiangcaiHuang <xiangcai@synopsys.com>
+Date: Thu, 17 Aug 2017 11:21:12 +0800
+Subject: [PATCH] Add embARC (FreeRTOS+LwIP) support to mbedtls
+
+---
+ library/net_sockets.c => embARC/net_alt.c |  94 ++-------------------
+ embARC/threading_alt.c                    |  80 ++++++++++++++++++
+ embARC/threading_alt.h                    |  65 ++++++++++++++
+ embARC/timing_alt.c                       | 111 ++++++++++++++++++++++++
+ embARC/timing_alt.h                       | 136 ++++++++++++++++++++++++++++++
+ library/ssl_srv.c                         |   2 +
+ library/ssl_tls.c                         |  21 ++++-
+ library/threading.c                       |  11 +++
+ 8 files changed, 434 insertions(+), 86 deletions(-)
+ rename library/net_sockets.c => embARC/net_alt.c (85%)
+ create mode 100644 embARC/threading_alt.c
+ create mode 100644 embARC/threading_alt.h
+ create mode 100644 embARC/timing_alt.c
+ create mode 100644 embARC/timing_alt.h
+
+diff --git a/library/net_sockets.c b/embARC/net_alt.c
+similarity index 85%
+rename from library/net_sockets.c
+rename to embARC/net_alt.c
+index cc06cbf..5c0bf0c 100644
+--- a/library/net_sockets.c
++++ b/embARC/net_alt.c
+@@ -27,98 +27,26 @@
+ 
+ #if defined(MBEDTLS_NET_C)
+ 
+-#if !defined(unix) && !defined(__unix__) && !defined(__unix) && \
+-    !defined(__APPLE__) && !defined(_WIN32)
+-#error "This module only works on Unix and Windows, see MBEDTLS_NET_C in config.h"
+-#endif
+-
+-#if defined(MBEDTLS_PLATFORM_C)
+-#include "mbedtls/platform.h"
+-#else
+-#include <stdlib.h>
+-#endif
+-
+-#include "mbedtls/net_sockets.h"
++#include "mbedtls/net.h"
+ 
+ #include <string.h>
+-
+-#if (defined(_WIN32) || defined(_WIN32_WCE)) && !defined(EFIX64) && \
+-    !defined(EFI32)
+-
+-#ifdef _WIN32_WINNT
+-#undef _WIN32_WINNT
+-#endif
+-/* Enables getaddrinfo() & Co */
+-#define _WIN32_WINNT 0x0501
+-#include <ws2tcpip.h>
+-
+-#include <winsock2.h>
+-#include <windows.h>
+-
+-#if defined(_MSC_VER)
+-#if defined(_WIN32_WCE)
+-#pragma comment( lib, "ws2.lib" )
+-#else
+-#pragma comment( lib, "ws2_32.lib" )
+-#endif
+-#endif /* _MSC_VER */
+-
+-#define read(fd,buf,len)        recv(fd,(char*)buf,(int) len,0)
+-#define write(fd,buf,len)       send(fd,(char*)buf,(int) len,0)
+-#define close(fd)               closesocket(fd)
+-
+-static int wsa_init_done = 0;
+-
+-#else /* ( _WIN32 || _WIN32_WCE ) && !EFIX64 && !EFI32 */
+-
+ #include <sys/types.h>
+ #include <sys/socket.h>
+-#include <netinet/in.h>
+-#include <arpa/inet.h>
+-#include <sys/time.h>
+-#include <unistd.h>
+-#include <signal.h>
+-#include <fcntl.h>
+ #include <netdb.h>
+ #include <errno.h>
+ 
+-#endif /* ( _WIN32 || _WIN32_WCE ) && !EFIX64 && !EFI32 */
+-
+-/* Some MS functions want int and MSVC warns if we pass size_t,
+- * but the standard fucntions use socklen_t, so cast only for MSVC */
+-#if defined(_MSC_VER)
+-#define MSVC_INT_CAST   (int)
+-#else
+-#define MSVC_INT_CAST
+-#endif
+-
++#include <stdlib.h>
+ #include <stdio.h>
+-
+ #include <time.h>
+-
+ #include <stdint.h>
+ 
++#define MSVC_INT_CAST
++
+ /*
+  * Prepare for using the sockets interface
+  */
+ static int net_prepare( void )
+ {
+-#if ( defined(_WIN32) || defined(_WIN32_WCE) ) && !defined(EFIX64) && \
+-    !defined(EFI32)
+-    WSADATA wsaData;
+-
+-    if( wsa_init_done == 0 )
+-    {
+-        if( WSAStartup( MAKEWORD(2,0), &wsaData ) != 0 )
+-            return( MBEDTLS_ERR_NET_SOCKET_FAILED );
+-
+-        wsa_init_done = 1;
+-    }
+-#else
+-#if !defined(EFIX64) && !defined(EFI32)
+-    signal( SIGPIPE, SIG_IGN );
+-#endif
+-#endif
+     return( 0 );
+ }
+ 
+@@ -272,7 +200,7 @@ static int net_would_block( const mbedtls_net_context *ctx )
+     /*
+      * Never return 'WOULD BLOCK' on a non-blocking socket
+      */
+-    if( ( fcntl( ctx->fd, F_GETFL ) & O_NONBLOCK ) != O_NONBLOCK )
++    if( ( fcntl( ctx->fd, F_GETFL, 0 ) & O_NONBLOCK ) != O_NONBLOCK )
+         return( 0 );
+ 
+     switch( errno )
+@@ -301,14 +229,8 @@ int mbedtls_net_accept( mbedtls_net_context *bind_ctx,
+ 
+     struct sockaddr_storage client_addr;
+ 
+-#if defined(__socklen_t_defined) || defined(_SOCKLEN_T) ||  \
+-    defined(_SOCKLEN_T_DECLARED) || defined(__DEFINED_socklen_t)
+     socklen_t n = (socklen_t) sizeof( client_addr );
+     socklen_t type_len = (socklen_t) sizeof( type );
+-#else
+-    int n = (int) sizeof( client_addr );
+-    int type_len = (int) sizeof( type );
+-#endif
+ 
+     /* Is this a TCP or UDP socket? */
+     if( getsockopt( bind_ctx->fd, SOL_SOCKET, SO_TYPE,
+@@ -394,6 +316,7 @@ int mbedtls_net_accept( mbedtls_net_context *bind_ctx,
+         }
+         else
+         {
++#if defined(LWIP_IPV6) && (LWIP_IPV6 == 1)
+             struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *) &client_addr;
+             *ip_len = sizeof( addr6->sin6_addr.s6_addr );
+ 
+@@ -401,6 +324,7 @@ int mbedtls_net_accept( mbedtls_net_context *bind_ctx,
+                 return( MBEDTLS_ERR_NET_BUFFER_TOO_SMALL );
+ 
+             memcpy( client_ip, &addr6->sin6_addr.s6_addr, *ip_len);
++#endif
+         }
+     }
+ 
+@@ -417,7 +341,7 @@ int mbedtls_net_set_block( mbedtls_net_context *ctx )
+     u_long n = 0;
+     return( ioctlsocket( ctx->fd, FIONBIO, &n ) );
+ #else
+-    return( fcntl( ctx->fd, F_SETFL, fcntl( ctx->fd, F_GETFL ) & ~O_NONBLOCK ) );
++    return( fcntl( ctx->fd, F_SETFL, fcntl( ctx->fd, F_GETFL, 0 ) & ~O_NONBLOCK ) );
+ #endif
+ }
+ 
+@@ -428,7 +352,7 @@ int mbedtls_net_set_nonblock( mbedtls_net_context *ctx )
+     u_long n = 1;
+     return( ioctlsocket( ctx->fd, FIONBIO, &n ) );
+ #else
+-    return( fcntl( ctx->fd, F_SETFL, fcntl( ctx->fd, F_GETFL ) | O_NONBLOCK ) );
++    return( fcntl( ctx->fd, F_SETFL, fcntl( ctx->fd, F_GETFL, 0 ) | O_NONBLOCK ) );
+ #endif
+ }
+ 
+diff --git a/embARC/threading_alt.c b/embARC/threading_alt.c
+new file mode 100644
+index 0000000..4f830a9
+--- /dev/null
++++ b/embARC/threading_alt.c
+@@ -0,0 +1,80 @@
++/*
++ *  Threading abstraction layer
++ *
++ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
++ *  SPDX-License-Identifier: Apache-2.0
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License"); you may
++ *  not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *  http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ *  This file is part of mbed TLS (https://tls.mbed.org)
++ */
++
++#if !defined(MBEDTLS_CONFIG_FILE)
++#include "mbedtls/config.h"
++#else
++#include MBEDTLS_CONFIG_FILE
++#endif
++
++#if defined(MBEDTLS_THREADING_C)
++
++#include "mbedtls/threading.h"
++
++#if defined(MBEDTLS_THREADING_ALT) && defined(OS_FREERTOS)
++
++void threading_mutex_init_freertos( mbedtls_threading_mutex_t *mutex )
++{
++    if( mutex == NULL)
++        return;
++
++    mutex->lock = xSemaphoreCreateMutex();
++    if (mutex->lock) {
++        mutex->magic = THREADING_LOCK_MAGIC;
++    } else {
++        mutex->magic = 0;
++    }
++}
++
++void threading_mutex_free_freertos( mbedtls_threading_mutex_t *mutex )
++{
++    if( (mutex == NULL) || (mutex->magic != THREADING_LOCK_MAGIC) || (mutex->lock == NULL) )
++        return;
++
++    (void) vSemaphoreDelete(mutex->lock);
++    mutex->magic = 0;
++    mutex->lock = NULL;
++}
++
++int threading_mutex_lock_freertos( mbedtls_threading_mutex_t *mutex )
++{
++    if( (mutex == NULL) || (mutex->magic != THREADING_LOCK_MAGIC) || (mutex->lock == NULL) )
++        return( MBEDTLS_ERR_THREADING_BAD_INPUT_DATA );
++
++    while ( xSemaphoreTake(mutex->lock, portMAX_DELAY) != pdTRUE );
++
++    return( 0 );
++}
++
++int threading_mutex_unlock_freertos( mbedtls_threading_mutex_t *mutex )
++{
++    if( (mutex == NULL) || (mutex->magic != THREADING_LOCK_MAGIC) || (mutex->lock == NULL) )
++        return( MBEDTLS_ERR_THREADING_BAD_INPUT_DATA );
++
++    if( xSemaphoreGive( mutex->lock ) != pdTRUE )
++        return( MBEDTLS_ERR_THREADING_MUTEX_ERROR );
++
++    return( 0 );
++}
++
++#endif /* MBEDTLS_THREADING_ALT */
++
++#endif /* MBEDTLS_THREADING_C */
+diff --git a/embARC/threading_alt.h b/embARC/threading_alt.h
+new file mode 100644
+index 0000000..8ffee49
+--- /dev/null
++++ b/embARC/threading_alt.h
+@@ -0,0 +1,65 @@
++/**
++ * \file threading.h
++ *
++ * \brief Threading abstraction layer
++ *
++ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
++ *  SPDX-License-Identifier: Apache-2.0
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License"); you may
++ *  not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *  http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ *  This file is part of mbed TLS (https://tls.mbed.org)
++ */
++#ifndef MBEDTLS_THREADING_ALT_H
++#define MBEDTLS_THREADING_ALT_H
++
++#if !defined(MBEDTLS_CONFIG_FILE)
++#include "config.h"
++#else
++#include MBEDTLS_CONFIG_FILE
++#endif
++
++#include <stdlib.h>
++#include <stddef.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#if defined(MBEDTLS_THREADING_ALT) && defined(OS_FREERTOS)
++
++#include "FreeRTOS.h"
++#include "semphr.h"
++
++typedef struct
++{
++    SemaphoreHandle_t lock;
++    uint32_t magic;
++} mbedtls_threading_mutex_t;
++
++#define THREADING_LOCK_MAGIC        0x3FE42ED3
++
++#define MUTEX_INIT  = { NULL, 0 }
++
++void threading_mutex_init_freertos( mbedtls_threading_mutex_t *mutex );
++void threading_mutex_free_freertos( mbedtls_threading_mutex_t *mutex );
++int threading_mutex_lock_freertos( mbedtls_threading_mutex_t *mutex );
++int threading_mutex_unlock_freertos( mbedtls_threading_mutex_t *mutex );
++
++#endif /* MBEDTLS_THREADING_ALT */
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* threading.h */
+\ No newline at end of file
+diff --git a/embARC/timing_alt.c b/embARC/timing_alt.c
+new file mode 100644
+index 0000000..aaa5aab
+--- /dev/null
++++ b/embARC/timing_alt.c
+@@ -0,0 +1,111 @@
++/*
++ *  Portable interface to the CPU cycle counter
++ *
++ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
++ *  SPDX-License-Identifier: Apache-2.0
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License"); you may
++ *  not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *  http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ *  This file is part of mbed TLS (https://tls.mbed.org)
++ */
++/*
++ * Modified for port to ARC processor
++ */
++#include "embARC.h"
++
++#if !defined(MBEDTLS_CONFIG_FILE)
++#include "mbedtls/config.h"
++#else
++#include MBEDTLS_CONFIG_FILE
++#endif
++
++#if defined(MBEDTLS_SELF_TEST) && defined(MBEDTLS_PLATFORM_C)
++#include "mbedtls/platform.h"
++#else
++#include <stdio.h>
++#define mbedtls_printf     printf
++#endif
++
++#if defined(MBEDTLS_TIMING_ALT)
++#if defined(MBEDTLS_TIMING_C)
++
++#include "timing_alt.h"
++
++volatile int mbedtls_timing_alarmed = 0;
++
++unsigned long mbedtls_timing_hardclock( void )
++{
++	return (unsigned long)OSP_GET_CUR_HWTICKS();
++}
++
++unsigned long mbedtls_timing_get_timer( struct mbedtls_timing_hr_time *val, int reset )
++{
++	uint32_t cur_ms = OSP_GET_CUR_MS();
++
++	if (reset) {
++		val->ms = cur_ms;
++		return 0;
++	}
++
++	return (cur_ms - val->ms);
++}
++
++static void mbedtls_alarm_handler(void *param) {
++	mbedtls_timing_alarmed = 1;
++	int_disable(INTNO_TIMER1);
++}
++
++
++void mbedtls_set_alarm( int seconds )
++{
++	mbedtls_timing_alarmed = 0;
++	int_disable(INTNO_TIMER1); /* disable first then enable */
++	int_handler_install(INTNO_TIMER1, mbedtls_alarm_handler);
++	timer_start(TIMER_1, TIMER_CTRL_IE, 1000 * seconds * (BOARD_CPU_CLOCK / BOARD_SYS_TIMER_HZ));
++	int_enable(INTNO_TIMER1);
++}
++
++void mbedtls_timing_set_delay( void *data, uint32_t int_ms, uint32_t fin_ms )
++{
++	mbedtls_timing_delay_context *ctx = (mbedtls_timing_delay_context *) data;
++
++	ctx->int_ms = int_ms;
++	ctx->fin_ms = fin_ms;
++
++	if( fin_ms != 0 )
++        	(void) mbedtls_timing_get_timer( &ctx->timer, 1 );
++}
++
++
++int mbedtls_timing_get_delay( void *data )
++{
++	mbedtls_timing_delay_context *ctx = (mbedtls_timing_delay_context *) data;
++	unsigned long elapsed_ms;
++
++	if( ctx->fin_ms == 0 )
++		return( -1 );
++
++	elapsed_ms = mbedtls_timing_get_timer( &ctx->timer, 0 );
++
++	if( elapsed_ms >= ctx->fin_ms )
++        	return( 2 );
++
++	if( elapsed_ms >= ctx->int_ms )
++        	return( 1 );
++
++	return( 0 );
++}
++
++#endif /* MBEDTLS_TIMING_C */
++#endif /* MBEDTLS_TIMING_ALT */
++
+diff --git a/embARC/timing_alt.h b/embARC/timing_alt.h
+new file mode 100644
+index 0000000..151765d
+--- /dev/null
++++ b/embARC/timing_alt.h
+@@ -0,0 +1,136 @@
++/* ------------------------------------------
++ * Copyright (c) 2015, Synopsys, Inc. All rights reserved.
++
++ * Redistribution and use in source and binary forms, with or without modification,
++ * are permitted provided that the following conditions are met:
++
++ * 1) Redistributions of source code must retain the above copyright notice, this
++ * list of conditions and the following disclaimer.
++
++ * 2) Redistributions in binary form must reproduce the above copyright notice,
++ * this list of conditions and the following disclaimer in the documentation and/or
++ * other materials provided with the distribution.
++
++ * 3) Neither the name of the Synopsys, Inc., nor the names of its contributors may
++ * be used to endorse or promote products derived from this software without
++ * specific prior written permission.
++
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
++ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
++ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ * \version 2015.10
++ * \date 2015-12-29
++ * \author Wayne Ren(Wei.Ren@synopsys.com)
++--------------------------------------------- */
++#ifndef _TIMING_ALT_H_
++#define _TIMING_ALT_H_
++
++#if !defined(MBEDTLS_CONFIG_FILE)
++#include "mbedtls/config.h"
++#else
++#include MBEDTLS_CONFIG_FILE
++#endif
++
++#include <stdint.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/**
++ * \brief          timer structure
++ */
++struct mbedtls_timing_hr_time
++{
++	uint32_t ms;
++};
++
++/**
++ * \brief          Context for mbedtls_timing_set/get_delay()
++ */
++typedef struct
++{
++    struct mbedtls_timing_hr_time   timer;
++    uint32_t int_ms;
++    uint32_t fin_ms;
++} mbedtls_timing_delay_context;
++
++extern volatile int mbedtls_timing_alarmed;
++
++/**
++ * \brief          Return the CPU cycle counter value
++ *
++ * \warning        This is only a best effort! Do not rely on this!
++ *                 In particular, it is known to be unreliable on virtual
++ *                 machines.
++ */
++unsigned long mbedtls_timing_hardclock( void );
++
++/**
++ * \brief          Return the elapsed time in milliseconds
++ *
++ * \param val      points to a timer structure
++ * \param reset    if set to 1, the timer is restarted
++ */
++unsigned long mbedtls_timing_get_timer( struct mbedtls_timing_hr_time *val, int reset );
++
++/**
++ * \brief          Setup an alarm clock
++ *
++ * \param seconds  delay before the "mbedtls_timing_alarmed" flag is set
++ *
++ * \warning        Only one alarm at a time  is supported. In a threaded
++ *                 context, this means one for the whole process, not one per
++ *                 thread.
++ */
++void mbedtls_set_alarm( int seconds );
++
++/**
++ * \brief          Set a pair of delays to watch
++ *                 (See \c mbedtls_timing_get_delay().)
++ *
++ * \param data     Pointer to timing data
++ *                 Must point to a valid \c mbedtls_timing_delay_context struct.
++ * \param int_ms   First (intermediate) delay in milliseconds.
++ * \param fin_ms   Second (final) delay in milliseconds.
++ *                 Pass 0 to cancel the current delay.
++ */
++void mbedtls_timing_set_delay( void *data, uint32_t int_ms, uint32_t fin_ms );
++
++/**
++ * \brief          Get the status of delays
++ *                 (Memory helper: number of delays passed.)
++ *
++ * \param data     Pointer to timing data
++ *                 Must point to a valid \c mbedtls_timing_delay_context struct.
++ *
++ * \return         -1 if cancelled (fin_ms = 0)
++ *                  0 if none of the delays are passed,
++ *                  1 if only the intermediate delay is passed,
++ *                  2 if the final delay is passed.
++ */
++int mbedtls_timing_get_delay( void *data );
++
++
++#if defined(MBEDTLS_SELF_TEST)
++/**
++ * \brief          Checkup routine
++ *
++ * \return         0 if successful, or 1 if a test failed
++ */
++int mbedtls_timing_self_test( int verbose );
++#endif
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* timing.h */
+diff --git a/library/ssl_srv.c b/library/ssl_srv.c
+index fc0d2d7..b5ea02c 100644
+--- a/library/ssl_srv.c
++++ b/library/ssl_srv.c
+@@ -3016,6 +3016,8 @@ curve_matching_done:
+ #endif /* MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED) ||
+           MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED ||
+           MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED */
++    // mask dead store of p
++    (void)p;
+ 
+     ssl->out_msglen  = 4 + n;
+     ssl->out_msgtype = MBEDTLS_SSL_MSG_HANDSHAKE;
+diff --git a/library/ssl_tls.c b/library/ssl_tls.c
+index 84a04ae..2153c80 100644
+--- a/library/ssl_tls.c
++++ b/library/ssl_tls.c
+@@ -3608,6 +3608,24 @@ static int ssl_parse_record_header( mbedtls_ssl_context *ssl )
+                                         "expected %d, received %d",
+                                         ssl->in_epoch, rec_epoch ) );
+ 
++#if defined(MBEDTLS_SSL_SRV_C)
++            /*
++             * Check for an epoch 0 Change Cipher Spec retransmission.
++             */
++            if( ssl->conf->endpoint == MBEDTLS_SSL_IS_SERVER &&
++                ssl->state == MBEDTLS_SSL_HANDSHAKE_OVER &&
++                rec_epoch == 0 &&
++                ssl->in_epoch == 1 &&
++                ssl->in_msgtype == MBEDTLS_SSL_MSG_HANDSHAKE &&
++                ssl->in_left > 13 &&
++                ssl->in_buf[13] == MBEDTLS_SSL_HS_CLIENT_KEY_EXCHANGE )
++            {
++                MBEDTLS_SSL_DEBUG_MSG( 1, ( "possible Client Key Exchange "
++                                            "retransmission" ) );
++                return( mbedtls_ssl_resend( ssl ) );
++            }
++#endif
++
+ #if defined(MBEDTLS_SSL_DTLS_CLIENT_PORT_REUSE) && defined(MBEDTLS_SSL_SRV_C)
+             /*
+              * Check for an epoch 0 ClientHello. We can't use in_msg here to
+@@ -3737,7 +3755,8 @@ int mbedtls_ssl_read_record( mbedtls_ssl_context *ssl )
+ 
+         ret = mbedtls_ssl_handle_message_type( ssl );
+ 
+-    } while( MBEDTLS_ERR_SSL_NON_FATAL == ret );
++    } while( MBEDTLS_ERR_SSL_NON_FATAL == ret ||
++             ( MBEDTLS_ERR_SSL_WANT_READ == ret && ssl->in_msglen ) );
+ 
+     if( 0 != ret )
+     {
+diff --git a/library/threading.c b/library/threading.c
+index 83ec01a..92ae7ee 100644
+--- a/library/threading.c
++++ b/library/threading.c
+@@ -82,6 +82,16 @@ int (*mbedtls_mutex_unlock)( mbedtls_threading_mutex_t * ) = threading_mutex_unl
+ #endif /* MBEDTLS_THREADING_PTHREAD */
+ 
+ #if defined(MBEDTLS_THREADING_ALT)
++
++#if defined(OS_FREERTOS)
++
++void (*mbedtls_mutex_init)( mbedtls_threading_mutex_t * ) = threading_mutex_init_freertos;
++void (*mbedtls_mutex_free)( mbedtls_threading_mutex_t * ) = threading_mutex_free_freertos;
++int (*mbedtls_mutex_lock)( mbedtls_threading_mutex_t * ) = threading_mutex_lock_freertos;
++int (*mbedtls_mutex_unlock)( mbedtls_threading_mutex_t * ) = threading_mutex_unlock_freertos;
++
++#else
++
+ static int threading_mutex_fail( mbedtls_threading_mutex_t *mutex )
+ {
+     ((void) mutex );
+@@ -97,6 +107,7 @@ void (*mbedtls_mutex_init)( mbedtls_threading_mutex_t * ) = threading_mutex_dumm
+ void (*mbedtls_mutex_free)( mbedtls_threading_mutex_t * ) = threading_mutex_dummy;
+ int (*mbedtls_mutex_lock)( mbedtls_threading_mutex_t * ) = threading_mutex_fail;
+ int (*mbedtls_mutex_unlock)( mbedtls_threading_mutex_t * ) = threading_mutex_fail;
++#endif
+ 
+ /*
+  * Set functions pointers and initialize global mutexes
+-- 
+2.13.2.windows.1
+
