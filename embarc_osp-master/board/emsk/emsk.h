@@ -142,6 +142,8 @@
 //#define WF_HOTSPOT_PASSWD       "71222217"
 #define WF_HOTSPOT_NAME         "Kai iPhone"
 #define WF_HOTSPOT_PASSWD       "chuahdeekai"
+//#define WF_HOTSPOT_NAME         "Chuhu-1F"
+//#define WF_HOTSPOT_PASSWD       "035715888"
 //#define WF_HOTSPOT_NAME		    "Andy iPhone"
 //#define WF_HOTSPOT_PASSWD		"smalldeer"
 //#define WF_HOTSPOT_NAME         "need password"

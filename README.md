@@ -70,10 +70,12 @@ example:
 ### Makefile settings <div id='makefile'/>
 Target options about EMSK and toolchain:
 
-BOARD ?= emsk
-BD_VER ?= 22
-CUR_CORE ?= arcem7d
+```
+BOARD     ?= emsk
+BD_VER    ?= 22
+CUR_CORE  ?= arcem7d
 TOOLCHAIN ?= gnu
+```
 
 ## User Manual <div id='usermanual'/>
 ### Before Running This Application <div id='before'/>
@@ -89,13 +91,13 @@ Firstly, download source code of vending machine from GitHub.
 4. register a new user account from our website. 
  * register link: https://127.0.0.1/../server_side/sign_up.php
 
-4. change the value 'Authority' in the table 'sign_data' to 1.
-5. sign in to enter the main website.
-* register link: https://127.0.0.1/../server_side/sign_in.php
+5. change the value 'Authority' in the table 'sign_data' to 1.
+6. sign in to enter the main website.
+* sign in link: https://127.0.0.1/../server_side/sign_in.php
 
 
 ### Launch VSCode IDE <div id='vscode'/>
-```../ARC_VSCODE/StartVSCode.bat```
+```/ARC_VSCODE/StartVSCode.bat```
 Launch StartVSCode.bat to run this vending machine application. After launching VScode, right click on the workspace and choose add Folder in the path ```../ARC_VSCODE/vending-machine``` to workspace. 
 
 ### Wi-Fi hotspot connnection settings <div id='wifi'/>
@@ -131,7 +133,7 @@ After Wi-Fi connected, FREERTOS rises all tasks including communication, oled, t
 
 
 
-* ```..\server_side\```
+* ```\server_side\```
 
 | FILE                 | description                         |
 | -------------------: | :---------------------              |
