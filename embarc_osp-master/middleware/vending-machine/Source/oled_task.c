@@ -171,11 +171,7 @@ void draw(void) {
 		case input_4:   u8g_input(3);    break;
 		case recommand: u8g_recommand(); break;
 		case check:     u8g_check();     break;
-		case confirm:   
-			u8g_confirm();
-			oled_status = normal;
-			vTaskDelay(5000);
-		break;
+		case confirm:   u8g_confirm();   break;
 	}
 }
 
@@ -225,6 +221,12 @@ void oled_task(void *p_arg)
 		if (oled_status > 7)
 			oled_status = 0;
 
+		if (oled_status == confirm)
+		{
+			vTaskDelay(5000);
+			oled_status = normal;
+		}
+
 		if( xOledQueue != 0 )	
 		{
 			if( xQueueReceive( xOledQueue, &oled_data, 0 ) )
@@ -258,9 +260,7 @@ void oled_task(void *p_arg)
 						strncpy(type, oled_data.type, 6);
 					} else if (oled_data.status == purchase_confirm)
 					// for user to confirm the deal
-					{
 						oled_status = confirm;
-					} 
 				}
 				/*
 				else if (oled_data.source_id == id_wifi)

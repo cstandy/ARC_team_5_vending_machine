@@ -143,7 +143,7 @@ int main(int argc, char **argv)
 						EMBARC_PRINTF("\t name 4: %s, type 4: %s, #: %d\r\n", local_data.name[3], local_data.type[3], local_data.body[3].i);
 						EMBARC_PRINTF("\r\n#####################################################\r\n\r\n");
 					}
-					EMBARC_PRINTF("  -> main initial success\r\n");
+					EMBARC_PRINTF("  -> main initial success, please enter user account with num-pad.\r\n");
 				}
 			}
 		}
@@ -263,7 +263,7 @@ int main(int argc, char **argv)
 			{
 				if( xQueueReceive( xMainQueue, &data, portMAX_DELAY ) )
 				{
-					EMBARC_PRINTF("  -> main balance check wwith Wi-Fi\r\n");
+					EMBARC_PRINTF("  -> main balance check with Wi-Fi\r\n");
 					// EMBARC_PRINTF("receive data, source_id and target_id: %d, %d\r\n", data.source_id, data.target_id);
 					if (data.source_id == id_wifi)
 					{
